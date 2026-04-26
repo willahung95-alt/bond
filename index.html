@@ -3,61 +3,69 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>保證金管理系統</title>
+<title>BondOS · 保證金管理系統</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Noto+Sans+TC:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* ── Reset & Base ─────────────────────────────────────────── */
+/* ═══════════════════════════════════════════
+   TOKENS & RESET
+═══════════════════════════════════════════ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --primary-900: #0f172a;
-  --primary-800: #1e293b;
-  --primary-700: #334155;
-  --primary-600: #475569;
-  --primary-500: #64748b;
-  --primary-400: #94a3b8;
-  --primary-100: #f1f5f9;
-  --primary-50:  #f8fafc;
+  /* Brand — slightly more muted for light bg */
+  --brand:     #4f5ff7;
+  --brand-dim: #3d4edc;
+  --brand-bg:  rgba(79,95,247,.07);
+  --brand-ring:rgba(79,95,247,.2);
 
-  --accent-600: #2563eb;
-  --accent-500: #3b82f6;
-  --accent-100: #dbeafe;
-  --accent-50:  #eff6ff;
+  /* Status */
+  --emerald:    #059669;
+  --emerald-bg: rgba(5,150,105,.08);
+  --amber:      #d97706;
+  --amber-bg:   rgba(217,119,6,.08);
+  --rose:       #e11d48;
+  --rose-bg:    rgba(225,29,72,.07);
+  --violet:     #7c3aed;
+  --violet-bg:  rgba(124,58,237,.08);
+  --sky:        #0284c7;
+  --sky-bg:     rgba(2,132,199,.08);
+  --slate:      #475569;
+  --slate-bg:   rgba(71,85,105,.07);
 
-  --teal-600: #0d9488;
-  --teal-100: #ccfbf1;
-  --amber-600: #d97706;
-  --amber-100: #fef3c7;
-  --rose-600: #e11d48;
-  --rose-100: #ffe4e6;
-  --violet-600: #7c3aed;
-  --violet-100: #ede9fe;
-  --green-600: #16a34a;
-  --green-100: #dcfce7;
+  /* Light semantic palette */
+  --bg:         #f5f6f8;
+  --bg-2:       #ffffff;
+  --bg-3:       #f0f1f4;
+  --surface:    #ffffff;
+  --surface-2:  #f8f9fb;
+  --surface-3:  #f1f2f5;
+  --border:     rgba(0,0,0,.07);
+  --border-2:   rgba(0,0,0,.10);
+  --border-3:   rgba(0,0,0,.15);
+  --text:       #111827;
+  --text-2:     #4b5563;
+  --text-3:     #9ca3af;
+  --text-inv:   #ffffff;
 
-  --bg:        #f1f5f9;
-  --surface:   #ffffff;
-  --text:      #0f172a;
-  --text-2:    #475569;
-  --text-3:    #94a3b8;
-  --border:    #e2e8f0;
-  --border-focus: #93c5fd;
-  
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --r-sm: 6px;
-  --r-md: 8px;
-  --r-lg: 12px;
-  --r-xl: 16px;
-  
-  --font: 'Noto Sans TC', -apple-system, sans-serif;
-  --mono: 'DM Mono', monospace;
-  --transition: 0.2s ease;
+  /* Lighter shadows for light theme */
+  --shadow-xs:  0 1px 2px rgba(0,0,0,.06);
+  --shadow-sm:  0 2px 6px rgba(0,0,0,.07);
+  --shadow-md:  0 4px 16px rgba(0,0,0,.09);
+  --shadow-lg:  0 12px 40px rgba(0,0,0,.12);
+  --shadow-xl:  0 24px 60px rgba(0,0,0,.14);
+
+  /* Geometry */
+  --r-xs: 4px; --r-sm: 6px; --r-md: 8px; --r-lg: 12px; --r-xl: 16px; --r-2xl: 20px; --r-full: 9999px;
+  --sidebar-w: 228px;
+
+  /* Type */
+  --font: 'Plus Jakarta Sans','Noto Sans TC',-apple-system,sans-serif;
+  --mono: 'JetBrains Mono',monospace;
+  --ease: cubic-bezier(.16,1,.3,1);
 }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; color-scheme: light; }
 body {
   font-family: var(--font);
   background: var(--bg);
@@ -66,1253 +74,1614 @@ body {
   line-height: 1.6;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
-/* ── Custom Scrollbar ── */
-::-webkit-scrollbar { width: 8px; height: 8px; }
+/* No noise overlay needed for light theme */
+body::before { display: none; }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--primary-400); }
+::-webkit-scrollbar-thumb { background: var(--border-3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-3); }
 
-/* ── Sidebar Layout ───────────────────────────────────────── */
-.layout { display: flex; min-height: 100vh; }
+/* ═══════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════ */
+.layout { display: flex; min-height: 100vh; position: relative; z-index: 1; }
 
+/* ── Sidebar ── */
 .sidebar {
-  width: 240px;
-  background: var(--primary-900);
-  display: flex;
-  flex-direction: column;
-  position: fixed;
-  top: 0; left: 0; bottom: 0;
-  z-index: 50;
-  padding: 0 0 1.5rem;
-  box-shadow: 4px 0 10px rgba(0,0,0,0.05);
+  width: var(--sidebar-w);
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  position: fixed; top: 0; left: 0; bottom: 0;
+  z-index: 100;
+  padding: 0 0 16px;
+  box-shadow: var(--shadow-sm);
 }
 
 .sidebar-logo {
-  padding: 1.5rem;
-  border-bottom: 1px solid rgba(255,255,255,.1);
-  margin-bottom: 1rem;
+  padding: 20px 16px 16px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
+  display: flex; align-items: center; gap: 10px;
 }
-.logo-mark {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: .15em;
-  text-transform: uppercase;
-  color: var(--primary-400);
-  margin-bottom: 4px;
-}
-.logo-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: #fff;
-  line-height: 1.2;
-}
-.logo-title span { color: var(--accent-500); }
-
-.sidebar-section-label {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: .05em;
-  color: rgba(255,255,255,.4);
-  padding: .5rem 1.5rem .5rem;
-}
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 1.5rem;
-  margin: 2px .75rem;
+.logo-icon {
+  width: 30px; height: 30px;
+  background: linear-gradient(135deg, var(--brand) 0%, var(--violet) 100%);
   border-radius: var(--r-md);
-  cursor: pointer;
-  color: rgba(255,255,255,.7);
-  font-size: 14px;
-  font-weight: 500;
-  border: none;
-  background: none;
-  width: calc(100% - 1.5rem);
-  text-align: left;
-  transition: all var(--transition);
-  font-family: var(--font);
-}
-.nav-item:hover { background: rgba(255,255,255,.05); color: #fff; }
-.nav-item.active {
-  background: var(--accent-600);
-  color: #fff;
-}
-.nav-icon { width: 18px; height: 18px; flex-shrink: 0; }
-
-.sidebar-bottom {
-  margin-top: auto;
-  padding: 0 1rem;
-}
-.sync-status {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 1rem;
-  border-radius: var(--r-md);
-  font-size: 13px;
-  font-weight: 500;
-  color: rgba(255,255,255,.6);
-  background: rgba(255,255,255,.05);
-  margin: 0;
-}
-.sync-dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: var(--teal-600);
+  display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(79,95,247,.3);
 }
-.sync-dot.syncing { background: var(--amber-600); animation: pulse 1s infinite; }
-.sync-dot.error   { background: var(--rose-600); }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+.logo-text { display: flex; flex-direction: column; gap: 0; }
+.logo-name { font-size: 14px; font-weight: 700; color: var(--text); letter-spacing: -.3px; line-height: 1; }
+.logo-sub  { font-size: 10px; color: var(--text-3); letter-spacing: .08em; text-transform: uppercase; font-weight: 500; margin-top: 2px; }
 
-/* ── Main Content ─────────────────────────────────────────── */
-.main-content {
-  margin-left: 240px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+.nav-section { padding: 4px 8px; }
+.nav-label {
+  font-size: 10px; font-weight: 600; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--text-3);
+  padding: 8px 8px 4px;
 }
+.nav-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 7px 10px; border-radius: var(--r-md);
+  cursor: pointer; color: var(--text-2);
+  font-size: 13.5px; font-weight: 500;
+  border: none; background: none; width: 100%;
+  text-align: left; transition: all .15s var(--ease);
+  font-family: var(--font);
+  position: relative;
+}
+.nav-item:hover { background: var(--surface-3); color: var(--text); }
+.nav-item.active { background: var(--brand-bg); color: var(--brand); }
+.nav-item.active::before {
+  content: '';
+  position: absolute; left: 0; top: 25%; bottom: 25%;
+  width: 2px; border-radius: 1px;
+  background: var(--brand);
+}
+.nav-icon { width: 16px; height: 16px; flex-shrink: 0; opacity: .55; }
+.nav-item.active .nav-icon { opacity: 1; color: var(--brand); }
+.nav-item:hover .nav-icon { opacity: .8; }
+.nav-badge {
+  margin-left: auto;
+  font-size: 10px; font-weight: 700; font-family: var(--mono);
+  padding: 1px 6px; border-radius: var(--r-full);
+  background: var(--rose-bg); color: var(--rose);
+}
+
+.sidebar-footer {
+  margin-top: auto; padding: 0 8px;
+}
+.sync-pill {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; border-radius: var(--r-md);
+  font-size: 12px; font-weight: 500; color: var(--text-3);
+  background: var(--surface-2); border: 1px solid var(--border);
+}
+.sync-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; background: var(--emerald); }
+.sync-dot.syncing { background: var(--amber); animation: blink 1s infinite; }
+.sync-dot.error   { background: var(--rose); }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* ── Main ── */
+.main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
 
 .topbar {
-  background: var(--surface);
+  height: 52px; padding: 0 24px;
+  display: flex; align-items: center; justify-content: space-between;
   border-bottom: 1px solid var(--border);
-  padding: 0 2rem;
-  height: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 20;
+  background: rgba(255,255,255,.9);
+  backdrop-filter: blur(12px);
+  position: sticky; top: 0; z-index: 30;
 }
-.topbar-title { font-size: 18px; font-weight: 600; color: var(--text); }
-.topbar-actions { display: flex; align-items: center; gap: 12px; }
+.topbar-left { display: flex; align-items: center; gap: 8px; }
+.topbar-crumb { font-size: 13px; color: var(--text-3); }
+.topbar-crumb-sep { color: var(--text-3); font-size: 13px; margin: 0 2px; }
+.topbar-title { font-size: 14px; font-weight: 600; color: var(--text); }
+.topbar-right { display: flex; align-items: center; gap: 8px; }
 
-.page { padding: 2rem; display: none; animation: fadeIn .3s ease; }
+.page { padding: 28px 28px 60px; display: none; animation: pgIn .22s var(--ease); }
 .page.active { display: block; }
-@keyframes fadeIn { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:none} }
+@keyframes pgIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
 
-/* ── Stat Cards ───────────────────────────────────────────── */
+/* ═══════════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════════ */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: var(--r-md);
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  border: 1px solid var(--border-2);
+  background: var(--surface); color: var(--text);
+  transition: all .15s var(--ease);
+  font-family: var(--font); white-space: nowrap; line-height: 1;
+  box-shadow: var(--shadow-xs);
+}
+.btn:hover   { background: var(--surface-3); border-color: var(--border-3); box-shadow: var(--shadow-sm); }
+.btn:active  { transform: scale(.97); box-shadow: none; }
+.btn svg     { flex-shrink: 0; }
+
+.btn-primary {
+  background: var(--brand); color: #fff;
+  border-color: transparent;
+  box-shadow: 0 1px 3px rgba(79,95,247,.3), 0 0 0 1px rgba(79,95,247,.25);
+}
+.btn-primary:hover { background: var(--brand-dim); box-shadow: 0 3px 10px rgba(79,95,247,.35), 0 0 0 1px rgba(79,95,247,.35); }
+
+.btn-ghost { background: transparent; border-color: transparent; color: var(--brand); box-shadow: none; }
+.btn-ghost:hover { background: var(--brand-bg); border-color: transparent; box-shadow: none; }
+
+.btn-danger { background: var(--rose-bg); color: var(--rose); border-color: rgba(225,29,72,.15); box-shadow: none; }
+.btn-danger:hover { background: rgba(225,29,72,.12); border-color: rgba(225,29,72,.25); }
+
+.btn-sm { padding: 5px 10px; font-size: 12px; border-radius: var(--r-sm); }
+.btn-xs { padding: 3px 8px; font-size: 11px; border-radius: var(--r-xs); }
+
+.icon-btn {
+  width: 30px; height: 30px; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: var(--r-sm); border: 1px solid var(--border);
+  background: transparent; color: var(--text-2); cursor: pointer;
+  transition: all .15s;
+}
+.icon-btn:hover { background: var(--surface-3); color: var(--text); border-color: var(--border-2); }
+
+/* ═══════════════════════════════════════════
+   STAT CARDS
+═══════════════════════════════════════════ */
 .stat-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1.25rem;
-  margin-bottom: 2rem;
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 14px;
+  margin-bottom: 24px;
 }
 .stat-card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  padding: 1.5rem;
-  box-shadow: var(--shadow-sm);
-  position: relative;
-  overflow: hidden;
-  cursor: pointer;
-  transition: all var(--transition);
+  border-radius: var(--r-xl); padding: 20px;
+  cursor: pointer; position: relative; overflow: hidden;
+  transition: all .18s var(--ease);
+  box-shadow: var(--shadow-xs);
 }
-.stat-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); border-color: var(--primary-400); }
-.stat-card::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 4px;
+.stat-card:hover { border-color: var(--border-2); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+
+.stat-card-glow {
+  position: absolute; width: 100px; height: 100px;
+  border-radius: 50%; right: -30px; top: -30px;
+  opacity: .06; filter: blur(24px);
 }
-.stat-card.blue::after  { background: var(--accent-500); }
-.stat-card.teal::after  { background: var(--teal-600); }
-.stat-card.amber::after { background: var(--amber-600); }
-.stat-card.violet::after{ background: var(--violet-600); }
+.stat-card.c-brand .stat-card-glow  { background: var(--brand); }
+.stat-card.c-emerald .stat-card-glow { background: var(--emerald); }
+.stat-card.c-amber .stat-card-glow   { background: var(--amber); }
+.stat-card.c-violet .stat-card-glow  { background: var(--violet); }
 
-.stat-icon {
-  width: 40px; height: 40px;
-  border-radius: var(--r-md);
-  display: flex; align-items: center; justify-content: center;
-  margin-bottom: 1rem;
+.stat-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 9px; border-radius: var(--r-full);
+  font-size: 11px; font-weight: 600; margin-bottom: 14px;
 }
-.stat-card.blue  .stat-icon { background: var(--accent-100); color: var(--accent-600); }
-.stat-card.teal  .stat-icon { background: var(--teal-100); color: var(--teal-600); }
-.stat-card.amber .stat-icon { background: var(--amber-100); color: var(--amber-600); }
-.stat-card.violet .stat-icon { background: var(--violet-100); color: var(--violet-600); }
+.stat-card.c-brand   .stat-chip { background: var(--brand-bg);   color: var(--brand); }
+.stat-card.c-emerald .stat-chip { background: var(--emerald-bg); color: var(--emerald); }
+.stat-card.c-amber   .stat-chip { background: var(--amber-bg);   color: var(--amber); }
+.stat-card.c-violet  .stat-chip { background: var(--violet-bg);  color: var(--violet); }
 
-.stat-value { font-size: 32px; font-weight: 700; line-height: 1.2; font-family: var(--mono); color: var(--text); }
-.stat-label { font-size: 13px; color: var(--text-2); font-weight: 500; margin-top: 4px; }
+.stat-chip-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.stat-value { font-size: 34px; font-weight: 700; font-family: 'Inter','Noto Sans TC',sans-serif; line-height: 1; color: var(--text); margin-bottom: 5px; letter-spacing: -1.5px; }
+.stat-label { font-size: 12.5px; color: var(--text-2); font-weight: 500; }
 
-/* ── Cards ────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════
+   CARDS
+═══════════════════════════════════════════ */
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  box-shadow: var(--shadow-sm);
-  margin-bottom: 1.5rem;
-  overflow: hidden;
+  border-radius: var(--r-xl);
+  margin-bottom: 16px; overflow: hidden;
 }
 .card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.25rem 1.5rem;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px;
   border-bottom: 1px solid var(--border);
-  background: var(--surface);
 }
-.card-title { font-size: 16px; font-weight: 600; color: var(--text); }
-.card-body  { padding: 1.5rem; }
+.card-title { font-size: 13.5px; font-weight: 600; color: var(--text); }
+.card-count {
+  font-size: 11px; font-weight: 700; font-family: var(--mono);
+  color: var(--text-3); background: var(--surface-2);
+  padding: 2px 7px; border-radius: var(--r-full); border: 1px solid var(--border);
+  margin-left: 8px;
+}
+.card-body { padding: 16px 20px; }
 
-/* ── Buttons ──────────────────────────────────────────────── */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border-radius: var(--r-md);
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text);
-  transition: all var(--transition);
-  font-family: var(--font);
-  white-space: nowrap;
-}
-.btn:hover   { background: var(--primary-50); border-color: var(--primary-400); }
-.btn:active  { transform: scale(.98); }
-.btn-primary {
-  background: var(--accent-600);
-  color: #fff;
-  border-color: var(--accent-600);
-}
-.btn-primary:hover { background: var(--accent-500); border-color: var(--accent-500); box-shadow: var(--shadow-sm); }
-.btn-sm { padding: 6px 12px; font-size: 13px; border-radius: var(--r-sm); }
-.btn-danger { color: var(--rose-600); border-color: var(--rose-100); background: var(--rose-50); }
-.btn-danger:hover { background: var(--rose-100); border-color: var(--rose-600); }
-.btn-ghost { border-color: transparent; background: transparent; color: var(--accent-600); }
-.btn-ghost:hover { background: var(--accent-50); }
-
-/* ── Badges ───────────────────────────────────────────────── */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 4px 12px;
-  border-radius: 20px;
-  white-space: nowrap;
-}
-.badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; }
-.badge-bid      { background: var(--accent-50);  color: var(--accent-600); } .badge-bid::before   { background: var(--accent-600); }
-.badge-awarded  { background: var(--amber-100);  color: var(--amber-600);  } .badge-awarded::before{ background: var(--amber-600); }
-.badge-perf     { background: var(--teal-100);   color: var(--teal-600);   } .badge-perf::before  { background: var(--teal-600); }
-.badge-in-warranty { background: var(--accent-100); color: var(--accent-600); } .badge-in-warranty::before { background: var(--accent-600); }
-.badge-warranty { background: var(--violet-100); color: var(--violet-600); } .badge-warranty::before{ background: var(--violet-600); }
-.badge-done     { background: var(--primary-100); color: var(--primary-600);} .badge-done::before  { background: var(--primary-400); }
-
-/* ── Project Cards ────────────────────────────────────────── */
-.project-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  padding: 1.25rem 1.5rem;
-  margin-bottom: 12px;
-  cursor: pointer;
-  transition: all var(--transition);
+/* ═══════════════════════════════════════════
+   PROJECT CARDS (LIST)
+═══════════════════════════════════════════ */
+.projects-table { display: flex; flex-direction: column; gap: 0; }
+.project-row {
+  display: flex; align-items: center; gap: 16px;
+  padding: 13px 20px; border-bottom: 1px solid var(--border);
+  cursor: pointer; transition: background .12s;
   position: relative;
 }
-.project-card:hover { box-shadow: var(--shadow-md); border-color: var(--primary-400); transform: translateY(-2px); }
-.project-card.is-alert   { border-left: 4px solid var(--rose-600); border-radius: 0 var(--r-lg) var(--r-lg) 0; }
-.project-card.is-warning { border-left: 4px solid var(--amber-500); border-radius: 0 var(--r-lg) var(--r-lg) 0; }
+.project-row:last-child { border-bottom: none; }
+.project-row:hover { background: var(--surface-2); }
+.project-row.is-alert  { border-left: 2px solid var(--rose); }
+.project-row.is-warning{ border-left: 2px solid var(--amber); }
 
-.pc-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
-.pc-name   { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
-.pc-meta   { font-size: 13px; color: var(--text-2); display: flex; align-items: center; gap: 8px; }
+.pr-indicator { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.pr-info { flex: 1; min-width: 0; }
+.pr-name { font-size: 14px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+.pr-meta { font-size: 12px; color: var(--text-3); display: flex; align-items: center; gap: 8px; }
+.pr-divider { color: var(--border-2); }
+.pr-amounts { display: flex; gap: 6px; flex-shrink: 0; }
+.pr-dates   { display: flex; gap: 16px; flex-shrink: 0; }
+.pr-date    { text-align: right; }
+.pr-date-label { font-size: 10px; color: var(--text-3); margin-bottom: 1px; }
+.pr-date-val   { font-size: 12px; font-weight: 500; font-family: var(--mono); color: var(--text-2); }
+.pr-stage { flex-shrink: 0; }
 
-.bond-pills { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
-.bond-pill {
-  display: inline-flex; align-items: center;
-  font-size: 12px; padding: 4px 12px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  background: var(--primary-50);
-  color: var(--text-2);
-  font-family: var(--mono);
+/* ═══════════════════════════════════════════
+   BADGES & PILLS
+═══════════════════════════════════════════ */
+.badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 600;
+  padding: 3px 9px; border-radius: var(--r-full);
+  white-space: nowrap; letter-spacing: .01em;
 }
-.bond-pill.active { border-color: var(--accent-100); background: var(--accent-50); color: var(--accent-600); font-weight: 600; }
-.bp-type { margin-right: 6px; font-weight: 700; color: var(--text-3); }
-.bond-pill.active .bp-type { color: var(--accent-500); }
+.badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+.badge-bid         { background: var(--brand-bg);   color: var(--brand);   } .badge-bid::before        { background: var(--brand); }
+.badge-awarded     { background: var(--amber-bg);   color: var(--amber);   } .badge-awarded::before    { background: var(--amber); }
+.badge-perf        { background: var(--emerald-bg); color: var(--emerald); } .badge-perf::before       { background: var(--emerald); }
+.badge-in-warranty { background: var(--sky-bg);     color: var(--sky);     } .badge-in-warranty::before{ background: var(--sky); }
+.badge-warranty    { background: var(--violet-bg);  color: var(--violet);  } .badge-warranty::before   { background: var(--violet); }
+.badge-done        { background: var(--slate-bg);   color: var(--slate);   } .badge-done::before       { background: var(--slate); }
 
-.pc-dates { display: flex; gap: 20px; flex-wrap: wrap; padding-top: 12px; border-top: 1px dashed var(--border); }
-.pc-date  { font-size: 12px; color: var(--text-3); display: flex; flex-direction: column; gap: 2px; }
-.pc-date strong { color: var(--text); font-weight: 600; font-family: var(--mono); }
+.amount-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; padding: 2px 8px; border-radius: var(--r-sm);
+  border: 1px solid var(--border); background: var(--surface-2);
+  font-family: var(--mono); color: var(--text-2); white-space: nowrap;
+}
+.amount-pill.active { border-color: rgba(91,106,248,.25); background: var(--brand-bg); color: var(--brand); }
+.amount-pill-label { font-size: 9px; font-weight: 700; color: var(--text-3); letter-spacing: .05em; font-family: var(--font); }
+.amount-pill.active .amount-pill-label { color: rgba(91,106,248,.6); }
 
-/* ── Reminder items ───────────────────────────────────────── */
+/* ═══════════════════════════════════════════
+   REMINDER ITEMS
+═══════════════════════════════════════════ */
+.ri-list {}
 .ri-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  padding: 16px 0;
-  border-bottom: 1px solid var(--border);
-  transition: background var(--transition);
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0; border-bottom: 1px solid var(--border);
+  cursor: pointer; transition: background .1s;
 }
-.ri-item:hover { background: var(--primary-50); margin: 0 -1.5rem; padding-left: 1.5rem; padding-right: 1.5rem; }
 .ri-item:last-child { border-bottom: none; }
-.ri-dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
-.ri-dot.urgent  { background: var(--rose-600); box-shadow: 0 0 0 4px var(--rose-100); }
-.ri-dot.warning { background: var(--amber-500); box-shadow: 0 0 0 4px var(--amber-100); }
-.ri-dot.info    { background: var(--accent-500); box-shadow: 0 0 0 4px var(--accent-100); }
-.ri-dot.action  { background: var(--violet-500); box-shadow: 0 0 0 4px var(--violet-100); }
+.ri-item:hover { background: var(--surface-2); margin: 0 -20px; padding-left: 20px; padding-right: 20px; border-radius: var(--r-sm); }
 
-.ri-body    { flex: 1; }
-.ri-label   { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
-.ri-project { font-size: 13px; color: var(--text-2); }
-.ri-days    { font-size: 13px; font-weight: 600; white-space: nowrap; padding: 4px 12px; border-radius: 20px; }
-.ri-days.urgent  { background: var(--rose-100); color: var(--rose-600); }
-.ri-days.warning { background: var(--amber-100); color: var(--amber-600); }
-.ri-days.info    { background: var(--accent-100); color: var(--accent-600); }
-.ri-days.action  { background: var(--violet-100); color: var(--violet-600); }
+.ri-icon {
+  width: 30px; height: 30px; border-radius: var(--r-sm);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; font-size: 14px;
+}
+.ri-icon.urgent  { background: var(--rose-bg);   color: var(--rose); }
+.ri-icon.warning { background: var(--amber-bg);  color: var(--amber); }
+.ri-icon.info    { background: var(--brand-bg);  color: var(--brand); }
+.ri-icon.action  { background: var(--violet-bg); color: var(--violet); }
 
-/* ── Filter Bar ───────────────────────────────────────────── */
+.ri-body { flex: 1; min-width: 0; }
+.ri-label   { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ri-project { font-size: 11px; color: var(--text-3); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.ri-tag {
+  font-size: 11px; font-weight: 600; font-family: var(--mono);
+  padding: 3px 9px; border-radius: var(--r-full); white-space: nowrap;
+}
+.ri-tag.urgent  { background: var(--rose-bg);   color: var(--rose); }
+.ri-tag.warning { background: var(--amber-bg);  color: var(--amber); }
+.ri-tag.info    { background: var(--brand-bg);  color: var(--brand); }
+.ri-tag.action  { background: var(--violet-bg); color: var(--violet); }
+
+/* ═══════════════════════════════════════════
+   FILTER BAR
+═══════════════════════════════════════════ */
 .filter-bar {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 16px; flex-wrap: wrap;
 }
 .search-wrap {
-  position: relative;
-  flex: 1;
-  min-width: 250px;
-  max-width: 350px;
+  position: relative; flex: 1; min-width: 200px; max-width: 320px;
 }
-.search-icon {
-  position: absolute;
-  left: 14px; top: 50%;
-  transform: translateY(-50%);
-  color: var(--text-3);
-  width: 18px; height: 18px;
-}
+.search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--text-3); width: 15px; height: 15px; pointer-events: none; }
 .search-input {
-  width: 100%;
-  padding: 10px 16px 10px 40px;
-  border: 1px solid var(--border);
-  border-radius: var(--r-md);
-  background: var(--surface);
-  color: var(--text);
-  font-size: 14px;
-  font-family: var(--font);
-  transition: all var(--transition);
+  width: 100%; padding: 7px 12px 7px 34px;
+  border: 1px solid var(--border); border-radius: var(--r-md);
+  background: var(--surface); color: var(--text);
+  font-size: 13px; font-family: var(--font);
+  transition: all .15s;
 }
-.search-input:focus { outline: none; border-color: var(--accent-500); box-shadow: 0 0 0 3px var(--accent-100); }
+.search-input:focus { outline: none; border-color: rgba(91,106,248,.4); box-shadow: 0 0 0 3px var(--brand-ring); background: var(--surface-2); }
+.search-input::placeholder { color: var(--text-3); }
 
-.filter-pills { display: flex; gap: 8px; flex-wrap: wrap; }
-.filter-pill {
-  padding: 6px 16px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 600;
+.seg-control {
+  display: flex; gap: 2px; padding: 3px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-lg); flex-wrap: wrap;
+}
+.seg-btn {
+  padding: 5px 12px; border-radius: var(--r-md);
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  border: none; background: none; color: var(--text-2);
+  font-family: var(--font); transition: all .12s; white-space: nowrap;
+}
+.seg-btn:hover { color: var(--text); }
+.seg-btn.active { background: var(--surface-3); color: var(--text); box-shadow: var(--shadow-xs); }
+
+/* ═══════════════════════════════════════════
+   SKELETON LOADING
+═══════════════════════════════════════════ */
+@keyframes skshimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position:  600px 0; }
+}
+.sk {
+  display: block;
+  border-radius: var(--r-sm);
+  background: linear-gradient(
+    90deg,
+    var(--surface-2) 0%,
+    var(--surface-3) 40%,
+    var(--surface-2) 80%
+  );
+  background-size: 600px 100%;
+  animation: skshimmer 1.4s ease infinite;
+}
+.sk-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 20px; border-bottom: 1px solid var(--border);
+}
+.sk-row:last-child { border-bottom: none; }
+.sk-dot  { width: 8px;  height: 8px;  border-radius: 50%; flex-shrink: 0; }
+.sk-info { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.sk-line { height: 11px; }
+.sk-badge{ width: 80px; height: 22px; border-radius: var(--r-full); flex-shrink: 0; }
+
+.sk-stat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl); padding: 20px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.sk-chip  { height: 22px; width: 72px; border-radius: var(--r-full); }
+.sk-num   { height: 36px; width: 56px; border-radius: var(--r-sm); }
+.sk-label { height: 12px; width: 90px; border-radius: var(--r-sm); }
+
+.sk-ri {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0; border-bottom: 1px solid var(--border);
+}
+.sk-ri:last-child { border-bottom: none; }
+.sk-icon-sq { width: 30px; height: 30px; border-radius: var(--r-sm); flex-shrink: 0; }
+.sk-ri-body { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+.sk-tag { width: 60px; height: 22px; border-radius: var(--r-full); flex-shrink: 0; }
+
+/* ═══════════════════════════════════════════
+   PROJECT ROW — HIGH DENSITY REDESIGN
+═══════════════════════════════════════════ */
+.projects-table { display: flex; flex-direction: column; }
+
+.project-row {
+  display: grid;
+  grid-template-columns: 8px 1fr auto auto auto;
+  grid-template-rows: auto auto;
+  align-items: center;
+  gap: 0 14px;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--border);
   cursor: pointer;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text-2);
-  transition: all var(--transition);
+  transition: background .1s;
+  min-height: 64px;
+  position: relative;
 }
-.filter-pill:hover { border-color: var(--primary-400); color: var(--text); background: var(--primary-50); }
-.filter-pill.active { background: var(--primary-800); color: #fff; border-color: var(--primary-800); }
+.project-row:last-child { border-bottom: none; }
+.project-row:hover { background: var(--surface-2); }
+.project-row:hover .pr-arrow { opacity: 1; transform: translateX(0); }
 
-/* ── Forms ────────────────────────────────────────────────── */
-.form-section {
-  margin-bottom: 2rem;
-}
-.form-section-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--primary-900);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 1.25rem;
-}
-.form-section-title::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border);
-}
+.project-row.is-alert   { border-left: 2px solid var(--rose);  padding-left: 18px; }
+.project-row.is-warning { border-left: 2px solid var(--amber); padding-left: 18px; }
 
-.form-grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1.25rem; }
-.form-grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 1.25rem; }
-.form-grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 1.25rem; }
+.pr-indicator { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; align-self: center; }
 
-.field { display: flex; flex-direction: column; gap: 6px; }
-.field label {
-  font-size: 13px;
+.pr-info { min-width: 0; padding: 12px 0; }
+.pr-name {
+  font-size: 13.5px; font-weight: 600; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  margin-bottom: 3px; line-height: 1.3;
+}
+.pr-meta {
+  font-size: 11.5px; color: var(--text-3);
+  display: flex; align-items: center; gap: 6px;
+}
+.pr-divider { color: var(--border-2); font-size: 10px; }
+
+/* ── Amount column ── */
+.pr-amounts {
+  display: flex; flex-direction: column; gap: 3px;
+  align-items: flex-end; flex-shrink: 0; padding: 12px 0;
+}
+.amount-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; padding: 2px 7px; border-radius: var(--r-sm);
+  border: 1px solid var(--border); background: transparent;
+  font-family: var(--mono); color: var(--text-3); white-space: nowrap;
+  line-height: 1.5;
+}
+.amount-pill.active {
+  border-color: rgba(91,106,248,.22);
+  background: var(--brand-bg); color: var(--brand);
   font-weight: 600;
-  color: var(--primary-700);
 }
-.field label .req { color: var(--rose-600); margin-left: 2px; }
-.field input,
-.field select,
-.field textarea {
-  padding: 10px 14px;
-  border: 1px solid var(--border);
-  border-radius: var(--r-md);
-  background: var(--primary-50);
-  color: var(--text);
-  font-size: 14px;
+.amount-pill-label {
+  font-size: 9px; font-weight: 700; letter-spacing: .06em;
   font-family: var(--font);
-  transition: all var(--transition);
-  width: 100%;
+  opacity: .5;
+  text-transform: uppercase;
 }
-.field input:focus,
-.field select:focus,
-.field textarea:focus {
-  outline: none;
-  border-color: var(--accent-500);
-  background: var(--surface);
-  box-shadow: 0 0 0 3px var(--accent-100);
-}
-.field input[type="date"], .field input[type="number"] { font-family: var(--mono); }
-.field textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
-.field select { 
-  appearance: none; 
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); 
-  background-repeat: no-repeat; 
-  background-position: right 12px center; 
-  background-size: 16px;
-  padding-right: 36px; 
-}
+.amount-pill.active .amount-pill-label { opacity: .7; color: var(--brand); }
 
-/* ── Info / Warning boxes ─────────────────────────────────── */
-.notice {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 12px 16px;
-  border-radius: var(--r-md);
-  font-size: 13px;
-  font-weight: 500;
-  margin-bottom: 1.5rem;
+/* ── Dates column ── */
+.pr-dates {
+  display: flex; gap: 12px; flex-shrink: 0;
+  padding: 12px 0;
+  border-left: 1px solid var(--border);
+  padding-left: 14px;
 }
-.notice.info    { background: var(--accent-50);  color: var(--accent-600); border: 1px solid var(--accent-100); }
-.notice.warning { background: var(--amber-50);   color: var(--amber-600);  border: 1px solid var(--amber-100); }
-.notice-icon svg { width: 18px; height: 18px; }
+.pr-date { text-align: center; min-width: 52px; }
+.pr-date-label {
+  font-size: 9.5px; font-weight: 600; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--text-3);
+  margin-bottom: 3px;
+}
+.pr-date-val {
+  font-size: 12px; font-weight: 500;
+  font-family: var(--mono); color: var(--text-2);
+  line-height: 1;
+}
+.pr-date-val.near { color: var(--amber); }
+.pr-date-val.urgent { color: var(--rose); font-weight: 700; }
 
-/* ── Action bar ───────────────────────────────────────────── */
-.action-bar {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 12px;
-  padding-top: 1.5rem;
-  margin-top: 2rem;
-  border-top: 1px solid var(--border);
-}
-.action-bar-left { margin-right: auto; }
-
-/* ── Modal ────────────────────────────────────────────────── */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(4px);
-  z-index: 200;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  animation: overlayIn .2s ease;
-}
-@keyframes overlayIn { from{opacity:0} to{opacity:1} }
-.modal {
-  background: var(--surface);
-  border-radius: var(--r-xl);
-  box-shadow: var(--shadow-lg);
-  padding: 2rem;
-  width: 100%;
-  max-width: 800px;
-  max-height: 90vh;
-  overflow-y: auto;
-  animation: modalIn .3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-@keyframes modalIn { from{opacity:0;transform:translateY(20px) scale(0.95)} to{opacity:1;transform:none} }
-.modal-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1.5rem; }
-.modal-title    { font-size: 20px; font-weight: 700; color: var(--text); }
-.modal-close {
-  width: 36px; height: 36px;
-  border-radius: var(--r-md);
-  border: 1px solid transparent;
-  background: var(--primary-50);
-  color: var(--primary-600);
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: all var(--transition);
-}
-.modal-close:hover { background: var(--rose-50); color: var(--rose-600); border-color: var(--rose-100); }
-
-/* ── History ──────────────────────────────────────────────── */
-.history-list { display: flex; flex-direction: column; gap: 8px; background: var(--primary-50); padding: 1rem; border-radius: var(--r-md); }
-.history-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  font-size: 13px;
-  color: var(--text-2);
-}
-.history-item::before {
-  content: '';
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: var(--primary-400);
-  margin-top: 7px;
+/* ── Stage + arrow ── */
+.pr-stage { flex-shrink: 0; display: flex; align-items: center; gap: 8px; }
+.pr-arrow {
+  color: var(--text-3); opacity: 0;
+  transform: translateX(-4px);
+  transition: all .15s var(--ease);
   flex-shrink: 0;
 }
 
-/* ── Loading / Toast ──────────────────────────────────────── */
-.toast-container { position: fixed; bottom: 2rem; right: 2rem; z-index: 999; display: flex; flex-direction: column; gap: 12px; }
-.toast {
-  display: flex; align-items: center; gap: 12px;
-  padding: 12px 20px;
+/* ═══════════════════════════════════════════
+   FORM — REFINED EXPERIENCE
+═══════════════════════════════════════════ */
+.form-block {
+  padding: 22px 22px 20px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+.form-block:last-of-type { border-bottom: none; }
+/* Left accent stripe per block */
+.form-block-accent {
+  position: absolute; left: 0; top: 16px; bottom: 16px;
+  width: 2px; border-radius: 1px;
+  opacity: .4;
+}
+
+.form-block-header {
+  display: flex; align-items: center; gap: 9px;
+  margin-bottom: 18px;
+}
+.form-block-icon {
+  width: 30px; height: 30px; border-radius: var(--r-md);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.form-block-title {
+  font-size: 13px; font-weight: 700; letter-spacing: .01em;
+  color: var(--text);
+}
+.form-block-desc {
+  margin-left: auto;
+  font-size: 11px; color: var(--text-3);
+}
+
+.grid-2 { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 14px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 14px; }
+
+/* ── Field ── */
+.field { display: flex; flex-direction: column; gap: 0; }
+
+.field label {
+  font-size: 11px; font-weight: 700; color: var(--text-3);
+  letter-spacing: .07em; text-transform: uppercase;
+  margin-bottom: 6px;
+  display: flex; align-items: center; gap: 4px;
+}
+.field label .req { color: var(--rose); }
+
+.field input, .field select, .field textarea {
+  padding: 9px 12px;
+  border: 1px solid var(--border-2);
   border-radius: var(--r-md);
-  background: var(--primary-800); color: #fff;
-  font-size: 14px; font-weight: 500;
-  box-shadow: var(--shadow-lg);
-  animation: toastIn .3s cubic-bezier(0.16, 1, 0.3, 1);
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: 13.5px; font-family: var(--font);
+  transition: border-color .15s, box-shadow .15s, background .15s;
+  width: 100%;
+  /* subtle inner shadow for depth */
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.2);
 }
-.toast.error { background: var(--rose-600); }
-.toast.success { background: var(--teal-600); }
-@keyframes toastIn { from{opacity:0;transform:translateX(30px)} to{opacity:1;transform:none} }
+.field input:hover:not(:focus),
+.field select:hover:not(:focus),
+.field textarea:hover:not(:focus) {
+  border-color: var(--border-3);
+  background: var(--surface-3);
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  outline: none;
+  border-color: rgba(91,106,248,.55);
+  background: var(--surface-3);
+  /* layered focus ring: tight inner glow + wider halo */
+  box-shadow:
+    inset 0 1px 2px rgba(0,0,0,.15),
+    0 0 0 1px rgba(91,106,248,.3),
+    0 0 0 4px rgba(91,106,248,.1),
+    0 0 12px rgba(91,106,248,.08);
+}
+.field input::placeholder { color: var(--text-3); font-size: 13px; }
+.field input[type="date"]   { font-family: var(--mono); font-size: 13px; color-scheme: light; }
+.field input[type="number"] { font-family: var(--mono); font-size: 13.5px; }
+.field textarea { resize: vertical; min-height: 70px; line-height: 1.6; }
 
-/* ── Empty state ──────────────────────────────────────────── */
-.empty { text-align: center; padding: 4rem 2rem; color: var(--text-3); }
-.empty-icon { width: 48px; height: 48px; margin: 0 auto 1rem; color: var(--primary-400); }
-.empty-title { font-size: 16px; font-weight: 600; color: var(--text-2); margin-bottom: 6px; }
-.empty-sub   { font-size: 14px; }
+/* ── Select wrapper — arrow via pseudo-element, zero background-image ── */
+.sel-wrap {
+  position: relative;
+  display: block;
+}
+.sel-wrap::after {
+  content: '';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0; height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid var(--text-3);
+  pointer-events: none;
+  transition: border-top-color .15s;
+}
+.sel-wrap:focus-within::after {
+  border-top-color: var(--brand);
+}
+.field select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  background: var(--surface-2) !important;
+  background-image: none !important;
+  padding-right: 32px;
+  width: 100%;
+}
+.field select::-ms-expand { display: none; }
+.field select option { background: #ffffff; color: var(--text); }
 
-/* ── Stage select bar above action bar ───────────────────── */
-.stage-select-bar {
-  background: var(--accent-50);
-  border: 1px solid var(--accent-100);
-  border-radius: var(--r-lg);
-  padding: 1.25rem 1.5rem;
-  margin-top: 2rem;
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-}
-.stage-select-bar label {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--accent-600);
-  white-space: nowrap;
-}
-.stage-select-bar select {
-  flex: 1;
-  background: var(--surface);
-  border-color: var(--accent-100);
-  font-weight: 600;
-  color: var(--accent-600);
-}
+/* field helper text */
+.field-hint { font-size: 11px; color: var(--text-3); margin-top: 5px; }
 
 .cheque-exp-row { display: none; }
-.cheque-exp-row.visible { display: grid; animation: fadeIn .2s ease; }
+.cheque-exp-row.visible { display: grid; animation: pgIn .18s var(--ease); margin-top: 12px; }
+.stage-footer {
+  padding: 16px 20px;
+  background: var(--surface-2);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; gap: 16px;
+}
+.stage-footer-label {
+  font-size: 12px; font-weight: 700; color: var(--text-2);
+  letter-spacing: .04em; text-transform: uppercase; white-space: nowrap;
+}
+/* ── Stage footer select wrapper ── */
+.stage-footer-wrap {
+  position: relative;
+  flex: 1;
+}
+.stage-footer-wrap::after {
+  content: '';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0; height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid var(--brand);
+  pointer-events: none;
+  opacity: .7;
+  transition: opacity .15s;
+}
+.stage-footer-wrap:focus-within::after { opacity: 1; }
+.stage-footer select {
+  width: 100%;
+  padding: 8px 32px 8px 11px;
+  border: 1px solid rgba(79,95,247,.25);
+  border-radius: var(--r-md);
+  background: var(--brand-bg) !important;
+  background-image: none !important;
+  color: var(--brand);
+  font-size: 13px; font-weight: 700; font-family: var(--font);
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  cursor: pointer; transition: all .15s;
+}
+.stage-footer select::-ms-expand { display: none; }
+.stage-footer select:focus { outline: none; box-shadow: 0 0 0 3px var(--brand-ring); }
+.stage-footer select option { background: #ffffff; color: var(--text); font-weight: 500; }
 
-@media (max-width: 1024px) {
-  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+/* ── Notices ── */
+.notice {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 14px; border-radius: var(--r-md);
+  font-size: 12.5px; font-weight: 500; margin-bottom: 16px;
+}
+.notice svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; }
+.notice.info    { background: var(--brand-bg);  color: #a5b4fc; border: 1px solid rgba(91,106,248,.2); }
+.notice.warning { background: var(--amber-bg);  color: #fcd34d; border: 1px solid rgba(245,158,11,.2); }
+.notice.success { background: var(--emerald-bg);color: #6ee7b7; border: 1px solid rgba(16,185,129,.2); }
+
+/* ── Action bar ── */
+.action-bar {
+  display: flex; align-items: center; justify-content: flex-end; gap: 8px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+.action-bar-left { margin-right: auto; }
+
+/* ═══════════════════════════════════════════
+   MODAL
+═══════════════════════════════════════════ */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(0,0,0,.7); backdrop-filter: blur(6px);
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 32px 16px; overflow-y: auto;
+  animation: ovIn .18s ease;
+}
+@keyframes ovIn { from{opacity:0} to{opacity:1} }
+
+.modal {
+  background: var(--bg-2);
+  border: 1px solid var(--border-2);
+  border-radius: var(--r-2xl);
+  box-shadow: var(--shadow-xl);
+  width: 100%; max-width: 780px;
+  animation: mdIn .22s var(--ease);
+  overflow: hidden;
+}
+@keyframes mdIn { from{opacity:0;transform:translateY(-16px) scale(.97)} to{opacity:1;transform:none} }
+
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 20px; border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.modal-title-row { display: flex; align-items: center; gap: 12px; }
+.modal-title { font-size: 16px; font-weight: 700; color: var(--text); }
+
+.modal-close {
+  width: 28px; height: 28px; border-radius: var(--r-sm);
+  border: 1px solid var(--border); background: var(--surface-2);
+  color: var(--text-2); cursor: pointer; display: flex;
+  align-items: center; justify-content: center; transition: all .12s;
+}
+.modal-close:hover { background: var(--rose-bg); color: var(--rose); border-color: rgba(244,63,94,.25); }
+
+/* ─ History ─ */
+.history-list {
+  display: flex; flex-direction: column; gap: 1px;
+}
+.history-entry {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 10px; border-radius: var(--r-sm);
+  font-size: 12px; color: var(--text-3);
+  transition: background .1s;
+}
+.history-entry:hover { background: var(--surface-2); }
+.history-entry-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--border-3); flex-shrink: 0;
+}
+.history-entry-time { font-family: var(--mono); font-size: 11px; color: var(--text-3); flex-shrink: 0; }
+.history-entry-text { flex: 1; }
+
+/* ═══════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════ */
+.toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+.toast {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 16px; border-radius: var(--r-lg);
+  background: var(--surface-3); color: var(--text);
+  font-size: 13px; font-weight: 500;
+  border: 1px solid var(--border-2);
+  box-shadow: var(--shadow-lg);
+  animation: toastIn .22s var(--ease);
+  pointer-events: auto; min-width: 200px;
+}
+.toast.error   { background: rgba(244,63,94,.15);  color: #fda4af; border-color: rgba(244,63,94,.25); }
+.toast.success { background: rgba(16,185,129,.12); color: #6ee7b7; border-color: rgba(16,185,129,.25); }
+@keyframes toastIn { from{opacity:0;transform:translateY(10px) scale(.96)} to{opacity:1;transform:none} }
+
+/* ═══════════════════════════════════════════
+   EMPTY STATES
+═══════════════════════════════════════════ */
+.empty-state {
+  text-align: center; padding: 48px 24px; color: var(--text-3);
+}
+.empty-icon { width: 44px; height: 44px; margin: 0 auto 12px; color: var(--border-3); }
+.empty-title { font-size: 14px; font-weight: 600; color: var(--text-2); margin-bottom: 4px; }
+.empty-sub   { font-size: 13px; }
+
+/* ═══════════════════════════════════════════
+   DIVIDER
+═══════════════════════════════════════════ */
+.divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════ */
+@media (max-width: 1100px) { .stat-grid { grid-template-columns: repeat(2,1fr); } }
+@media (max-width: 900px) {
+  .grid-4 { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .grid-3 { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .pr-dates { display: none; }
 }
 @media (max-width: 768px) {
-  .sidebar { transform: translateX(-100%); }
-  .main-content { margin-left: 0; }
-  .form-grid-4, .form-grid-3 { grid-template-columns: repeat(2, minmax(0,1fr)); }
-  .page { padding: 1.5rem; }
-  .topbar { padding: 0 1.5rem; }
+  :root { --sidebar-w: 0px; }
+  .sidebar { display: none; }
+  .main { margin-left: 0; }
+  .page { padding: 16px; }
 }
 </style>
 </head>
 <body>
 <div class="layout">
 
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-logo">
-      <div class="logo-mark">Bond Manager</div>
-      <div class="logo-title">保證金<span>管理系統</span></div>
+<!-- ════ SIDEBAR ════ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
     </div>
+    <div class="logo-text">
+      <div class="logo-name">BondOS</div>
+      <div class="logo-sub">保證金管理</div>
+    </div>
+  </div>
 
-    <div class="sidebar-section-label">主選單</div>
-    <button class="nav-item active" onclick="switchPage('dashboard')">
-      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+  <div class="nav-section">
+    <div class="nav-label">工作區</div>
+    <button class="nav-item active" onclick="switchPage('dashboard')" id="nav-dashboard">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
       總覽儀表板
     </button>
-    <button class="nav-item" onclick="switchPage('projects')">
-      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+    <button class="nav-item" onclick="switchPage('projects')" id="nav-projects">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z"/></svg>
       標案管理
     </button>
-    <button class="nav-item" onclick="switchPage('reminders')">
-      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+    <button class="nav-item" onclick="switchPage('reminders')" id="nav-reminders">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/></svg>
       提醒事項
+      <span class="nav-badge" id="reminder-badge" style="display:none">0</span>
     </button>
-    <button class="nav-item" onclick="switchPage('add')">
-      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+    <button class="nav-item" onclick="switchPage('add')" id="nav-add">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
       新增標案
     </button>
+  </div>
 
-    <div class="sidebar-bottom">
-      <div class="sync-status" id="sync-status">
-        <div class="sync-dot" id="sync-dot"></div>
-        <span id="sync-text">已連線</span>
-      </div>
+  <div class="sidebar-footer">
+    <div class="sync-pill">
+      <div class="sync-dot" id="sync-dot"></div>
+      <span id="sync-text" style="flex:1;font-size:11.5px">已同步</span>
+      <button class="icon-btn" onclick="loadProjects()" title="重新整理" style="width:22px;height:22px;border:none;background:transparent;">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>
+      </button>
     </div>
-  </aside>
+  </div>
+</aside>
 
-  <div class="main-content">
-    <header class="topbar">
+<!-- ════ MAIN ════ -->
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-left">
+      <span class="topbar-crumb">BondOS</span>
+      <span class="topbar-crumb-sep">/</span>
       <span class="topbar-title" id="topbar-title">總覽儀表板</span>
-      <div class="topbar-actions">
-        <button class="btn btn-ghost btn-sm" onclick="loadProjects()">
-          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-          重新整理
-        </button>
-        <button class="btn btn-primary btn-sm" onclick="switchPage('add')">
-          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-          新增標案
-        </button>
-      </div>
-    </header>
-
-    <div class="page active" id="page-dashboard">
-      <div class="stat-grid" id="stats"></div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(400px, 1fr));gap:1.5rem">
-        <div class="card">
-          <div class="card-header">
-            <span class="card-title">最近標案</span>
-            <button class="btn btn-sm btn-ghost" onclick="switchPage('projects')">查看全部</button>
-          </div>
-          <div class="card-body" id="dash-projects"></div>
-        </div>
-        <div class="card">
-          <div class="card-header">
-            <span class="card-title">待辦與即將到期</span>
-            <button class="btn btn-sm btn-ghost" onclick="switchPage('reminders')">查看全部</button>
-          </div>
-          <div class="card-body" id="dash-reminders"></div>
-        </div>
-      </div>
     </div>
-
-    <div class="page" id="page-projects">
-      <div class="filter-bar">
-        <div class="search-wrap">
-          <svg class="search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-          <input class="search-input" type="text" placeholder="搜尋標案名稱或客戶..." id="search-input" oninput="renderProjects()">
-        </div>
-        <div class="filter-pills">
-          <button class="filter-pill active" onclick="setFilter('all',this)">全部</button>
-          <button class="filter-pill" onclick="setFilter('bid',this)">押標金</button>
-          <button class="filter-pill" onclick="setFilter('awarded',this)">得標</button>
-          <button class="filter-pill" onclick="setFilter('performance',this)">履保金</button>
-          <button class="filter-pill" onclick="setFilter('warranty',this)">保固金</button>
-          <button class="filter-pill" onclick="setFilter('done',this)">已完成</button>
-        </div>
-      </div>
-      <div id="projects-list"></div>
+    <div class="topbar-right">
+      <button class="btn btn-primary btn-sm" onclick="switchPage('add')">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+        新增標案
+      </button>
     </div>
+  </header>
 
-    <div class="page" id="page-reminders">
+  <!-- ── Dashboard ── -->
+  <div class="page active" id="page-dashboard">
+    <div class="stat-grid" id="stats"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
       <div class="card">
-        <div class="card-header"><span class="card-title">所有待辦與到期提醒</span></div>
-        <div class="card-body" id="reminders-list"></div>
-      </div>
-    </div>
-
-    <div class="page" id="page-add">
-      <div class="card" style="max-width: 900px; margin: 0 auto;">
-        <div class="card-header"><span class="card-title">新增標案</span></div>
-        <div class="card-body">
-          <div class="form-section">
-            <div class="form-section-title">
-              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-              基本資訊
-            </div>
-            <div class="form-grid-3" style="margin-bottom:1.25rem">
-              <div class="field"><label>標案名稱 <span class="req">*</span></label><input type="text" id="f-name" placeholder="XX機關採購案"></div>
-              <div class="field"><label>客戶 / 業主</label><input type="text" id="f-client" placeholder="機關名稱"></div>
-              <div class="field"><label>業務負責人</label><select id="f-owner"><option value="">請選擇</option><option>Melissa</option><option>Willa</option><option>Annie</option></select></div>
-            </div>
-            <div class="form-grid-3">
-              <div class="field"><label>開標日期</label><input type="date" id="f-bid-date"></div>
-              <div class="field"><label>標案金額（元）</label><input type="number" id="f-amount" placeholder="0"></div>
-              <div class="field"><label>備註</label><input type="text" id="f-note" placeholder="其他說明"></div>
-            </div>
+        <div class="card-header">
+          <div style="display:flex;align-items:center">
+            <span class="card-title">最近標案</span>
+            <span class="card-count" id="dash-proj-count">0</span>
           </div>
-          <div class="form-section">
-            <div class="form-section-title">
-              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-              押標金
-            </div>
-            <div class="form-grid-4" style="margin-bottom:1.25rem">
-              <div class="field"><label>申請日期</label><input type="date" id="f-bid-apply-date"></div>
-              <div class="field"><label>押標金金額（元）</label><input type="number" id="f-bid-bond" placeholder="0"></div>
-              <div class="field"><label>繳納方式</label><select id="f-bid-pay" onchange="toggleChequeExpAdd()"><option value="">請選擇</option><option>匯款</option><option>支票</option></select></div>
-              <div class="field"><label>預計收回日</label><input type="date" id="f-bid-return"></div>
-            </div>
-            <div class="cheque-exp-row form-grid-2" id="f-bid-chk-row" style="margin-bottom:1.25rem">
-              <div class="field"><label>支票有效期限</label><input type="date" id="f-bid-exp"></div>
-            </div>
-            <div class="form-grid-2">
-              <div class="field"><label>目前階段</label><select id="f-stage"><option value="bid">投標：已支付押標金</option><option value="awarded">已得標：待繳履保金</option><option value="performance">已履約：已支付履保金</option><option value="in_warranty">保固中：已繳保固金</option><option value="warranty">保固到期：退回保固金申請中</option><option value="done">已完成</option></select></div>
-            </div>
-          </div>
-          <div class="action-bar">
-            <button class="btn" onclick="clearAddForm()">清除重填</button>
-            <button class="btn btn-primary" onclick="addProject()">建立標案</button>
-          </div>
+          <button class="btn btn-ghost btn-xs" onclick="switchPage('projects')">查看全部 →</button>
         </div>
+        <div id="dash-projects"></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div style="display:flex;align-items:center">
+            <span class="card-title">待辦與到期提醒</span>
+            <span class="card-count" id="dash-rem-count">0</span>
+          </div>
+          <button class="btn btn-ghost btn-xs" onclick="switchPage('reminders')">查看全部 →</button>
+        </div>
+        <div class="card-body" id="dash-reminders"></div>
       </div>
     </div>
   </div>
+
+  <!-- ── Projects ── -->
+  <div class="page" id="page-projects">
+    <div class="filter-bar">
+      <div class="search-wrap">
+        <svg class="search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input class="search-input" type="text" placeholder="搜尋標案、客戶..." id="search-input" oninput="renderProjects()">
+      </div>
+      <div class="seg-control">
+        <button class="seg-btn active" onclick="setFilter('all',this)">全部</button>
+        <button class="seg-btn" onclick="setFilter('bid',this)">押標金</button>
+        <button class="seg-btn" onclick="setFilter('awarded',this)">得標</button>
+        <button class="seg-btn" onclick="setFilter('performance',this)">履保金</button>
+        <button class="seg-btn" onclick="setFilter('warranty',this)">保固金</button>
+        <button class="seg-btn" onclick="setFilter('done',this)">完成</button>
+      </div>
+    </div>
+    <div class="card">
+      <div id="projects-list"></div>
+    </div>
+  </div>
+
+  <!-- ── Reminders ── -->
+  <div class="page" id="page-reminders">
+    <div class="card">
+      <div class="card-header"><span class="card-title">所有待辦與到期提醒</span></div>
+      <div class="card-body" id="reminders-list"></div>
+    </div>
+  </div>
+
+  <!-- ── Add ── -->
+  <div class="page" id="page-add">
+    <div class="card" style="max-width:860px;margin:0 auto">
+      <div class="modal-header" style="border-radius:0">
+        <div class="modal-title-row">
+          <svg width="18" height="18" fill="none" stroke="var(--brand)" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+          <span class="modal-title">建立新標案</span>
+        </div>
+      </div>
+
+      <div class="form-block" style="padding-left:26px">
+        <div class="form-block-accent" style="background:var(--brand)"></div>
+        <div class="form-block-header">
+          <div class="form-block-icon" style="background:var(--brand-bg)"><svg width="13" height="13" fill="none" stroke="var(--brand)" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg></div>
+          <span class="form-block-title">基本資訊</span>
+        </div>
+        <div class="grid-3" style="margin-bottom:12px">
+          <div class="field"><label>標案名稱 <span class="req">*</span></label><input type="text" id="f-name" placeholder="例：XX市政府資訊採購案"></div>
+          <div class="field"><label>客戶 / 業主</label><input type="text" id="f-client" placeholder="機關名稱"></div>
+          <div class="field"><label>業務負責人</label><div class="sel-wrap"><select id="f-owner"><option value="">請選擇</option><option>Melissa</option><option>Willa</option><option>Annie</option></select></div></div>
+        </div>
+        <div class="grid-3">
+          <div class="field"><label>開標日期</label><input type="date" id="f-bid-date"></div>
+          <div class="field"><label>標案金額（元）</label><input type="number" id="f-amount" placeholder="0"></div>
+          <div class="field"><label>備註</label><input type="text" id="f-note" placeholder="其他說明"></div>
+        </div>
+      </div>
+
+      <div class="form-block" style="padding-left:26px">
+        <div class="form-block-accent" style="background:var(--brand)"></div>
+        <div class="form-block-header">
+          <div class="form-block-icon" style="background:var(--brand-bg)"><svg width="13" height="13" fill="none" stroke="var(--brand)" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+          <span class="form-block-title">押標金</span>
+        </div>
+        <div class="grid-4" style="margin-bottom:10px">
+          <div class="field"><label>申請日期</label><input type="date" id="f-bid-apply-date"></div>
+          <div class="field"><label>押標金金額（元）</label><input type="number" id="f-bid-bond" placeholder="0"></div>
+          <div class="field"><label>繳納方式</label><div class="sel-wrap"><select id="f-bid-pay" onchange="toggleChequeExpAdd()"><option value="">請選擇</option><option>匯款</option><option>支票</option></select></div></div>
+          <div class="field"><label>預計收回日</label><input type="date" id="f-bid-return"></div>
+        </div>
+        <div class="cheque-exp-row grid-2" id="f-bid-chk-row">
+          <div class="field"><label>支票有效期限</label><input type="date" id="f-bid-exp"></div>
+        </div>
+        <div class="grid-2" style="margin-top:12px">
+          <div class="field"><label>初始階段</label><div class="sel-wrap"><select id="f-stage"><option value="bid">投標：已支付押標金</option><option value="awarded">已得標：待繳履保金</option><option value="performance">已履約：已支付履保金</option><option value="in_warranty">保固中：已繳保固金</option><option value="warranty">保固到期：退回保固金申請中</option><option value="done">已完成</option></select></div></div>
+        </div>
+      </div>
+
+      <div class="action-bar">
+        <button class="btn btn-ghost" onclick="clearAddForm()">清除</button>
+        <button class="btn btn-primary" onclick="addProject()">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+          建立標案
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 </div>
 
 <div class="toast-container" id="toast-root"></div>
 <div id="modal-root"></div>
 
 <script>
-/* ══════════════════════════════════════════════════════════
-   設定：將下方 GAS_URL 替換成你的 Apps Script 網頁應用程式 URL
-══════════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════
+   CONFIG
+════════════════════════════════════════════════ */
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbzCJ4MqAQ1YAyO-mFn70ZXFj2HJmpDDxYPWUYA1g9WwSIZFW2aWHJ3JY2b1APXMKlpZmg/exec';
-/* ════════════════════════════════════════════════════════ */
 
+/* ════════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════════ */
 let projects = [];
 let filterStatus = 'all';
-const pageTitles = { dashboard:'總覽儀表板', projects:'標案管理', reminders:'提醒事項', add:'新增標案' };
+const PAGE_TITLES = { dashboard:'總覽儀表板', projects:'標案管理', reminders:'提醒事項', add:'新增標案' };
 
-/* ── API ─────────────────────────────────────────────────── */
+/* ════════════════════════════════════════════════
+   API
+════════════════════════════════════════════════ */
 async function apiGet() {
-  setSyncStatus('syncing', '讀取中...');
+  setSyncStatus('syncing','讀取中...');
   try {
-    const r = await fetch(GAS_URL, { method: 'GET' });
+    const r = await fetch(GAS_URL);
     const d = await r.json();
     if (!d.ok) throw new Error(d.error);
-    setSyncStatus('ok', '已同步');
+    setSyncStatus('ok','已同步');
     return d.data;
   } catch(e) {
-    setSyncStatus('error', '連線失敗');
-    toast('讀取失敗：' + e.message, 'error');
+    setSyncStatus('error','連線失敗');
+    toast('讀取失敗：' + e.message,'error');
     return null;
   }
 }
 
 async function apiPost(action, payload) {
-  setSyncStatus('syncing', '同步中...');
+  setSyncStatus('syncing','同步中...');
   try {
-    const r = await fetch(GAS_URL, {
-      method: 'POST',
-      body: JSON.stringify({ action, ...payload }),
-    });
+    const r = await fetch(GAS_URL, { method:'POST', body: JSON.stringify({action,...payload}) });
     const d = await r.json();
     if (!d.ok) throw new Error(d.error);
-    setSyncStatus('ok', '已同步');
+    setSyncStatus('ok','已同步');
     return d.data;
   } catch(e) {
-    setSyncStatus('error', '同步失敗');
-    toast('操作失敗：' + e.message, 'error');
+    setSyncStatus('error','同步失敗');
+    toast('操作失敗：' + e.message,'error');
     return null;
   }
 }
 
-/* ── Sync Status ─────────────────────────────────────────── */
+/* ════════════════════════════════════════════════
+   SYNC STATUS
+════════════════════════════════════════════════ */
 function setSyncStatus(state, text) {
   const dot = document.getElementById('sync-dot');
   const txt = document.getElementById('sync-text');
-  dot.className = 'sync-dot' + (state === 'syncing' ? ' syncing' : state === 'error' ? ' error' : '');
+  dot.className = 'sync-dot' + (state==='syncing' ? ' syncing' : state==='error' ? ' error' : '');
   txt.textContent = text;
 }
 
-/* ── Toast ───────────────────────────────────────────────── */
-function toast(msg, type = '') {
+/* ════════════════════════════════════════════════
+   TOAST
+════════════════════════════════════════════════ */
+function toast(msg, type='') {
   const root = document.getElementById('toast-root');
   const el = document.createElement('div');
-  el.className = 'toast' + (type ? ' ' + type : '');
-  el.innerHTML = type === 'success' ? `<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>${msg}` : msg;
+  el.className = 'toast' + (type ? ' '+type : '');
+  const icon = type==='success'
+    ? `<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>`
+    : type==='error'
+    ? `<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>`
+    : `<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path stroke-linecap="round" d="M12 8v4m0 4h.01"/></svg>`;
+  el.innerHTML = icon + msg;
   root.appendChild(el);
-  setTimeout(() => el.remove(), 3500);
+  setTimeout(() => { el.style.opacity='0'; el.style.transform='translateY(6px)'; el.style.transition='all .2s'; setTimeout(()=>el.remove(),200); }, 3200);
 }
 
-/* ── Helpers ─────────────────────────────────────────────── */
-function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 5); }
-function fmtMoney(n) { if (!n && n !== 0) return '—'; return Number(n).toLocaleString('zh-TW') + ' 元'; }
-function fmtDate(d) { return d ? d.replace(/-/g, '/') : '—'; }
+/* ════════════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════════════ */
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,5); }
+function fmtMoney(n) { if(!n&&n!==0) return '—'; return Number(n).toLocaleString('zh-TW') + ' 元'; }
+function fmtDate(d) { return d ? d.replace(/-/g,'/') : '—'; }
+function fmtDateShort(d) {
+  if (!d) return '—';
+  const parts = d.replace(/-/g,'/').split('/');
+  return parts.length===3 ? parts[1]+'/'+parts[2] : d;
+}
 function daysDiff(d) {
   if (!d) return null;
   const now = new Date(); now.setHours(0,0,0,0);
   const t = new Date(d); t.setHours(0,0,0,0);
-  return Math.ceil((t - now) / 864e5);
+  return Math.ceil((t-now)/864e5);
 }
-function stageLabel(s) {
-  return {
-    bid:         '投標：已支付押標金',
-    awarded:     '已得標：待繳履保金',
-    performance: '已履約：已支付履保金',
-    in_warranty: '保固中：已繳保固金',
-    warranty:    '保固到期：退回保固金申請中',
-    done:        '已完成'
-  }[s] || s;
+function nowDateTimeStr() {
+  const d = new Date(), p = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}/${p(d.getMonth()+1)}/${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
 }
-function stageBadge(s) {
-  return {
-    bid:         'badge-bid',
-    awarded:     'badge-awarded',
-    performance: 'badge-perf',
-    in_warranty: 'badge-in-warranty',
-    warranty:    'badge-warranty',
-    done:        'badge-done'
-  }[s] || 'badge-bid';
-}
-function esc(str) {
-  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+const STAGE_LABELS = {
+  bid:         '投標：已支付押標金',
+  awarded:     '已得標：待繳履保金',
+  performance: '已履約：已支付履保金',
+  in_warranty: '保固中：已繳保固金',
+  warranty:    '保固到期：退回保固金申請中',
+  done:        '已完成'
+};
+const STAGE_BADGES = {
+  bid:'badge-bid', awarded:'badge-awarded', performance:'badge-perf',
+  in_warranty:'badge-in-warranty', warranty:'badge-warranty', done:'badge-done'
+};
+const STAGE_DOTS = {
+  bid:'var(--brand)', awarded:'var(--amber)', performance:'var(--emerald)',
+  in_warranty:'var(--sky)', warranty:'var(--violet)', done:'var(--slate)'
+};
+function stageLabel(s) { return STAGE_LABELS[s] || s; }
+function stageBadge(s) { return STAGE_BADGES[s] || 'badge-bid'; }
+function stageDot(s)   { return STAGE_DOTS[s] || 'var(--brand)'; }
+
+/* ════════════════════════════════════════════════
+   NAVIGATION
+════════════════════════════════════════════════ */
+function switchPage(p) {
+  const pages = ['dashboard','projects','reminders','add'];
+  pages.forEach(pg => {
+    document.getElementById('nav-'+pg)?.classList.toggle('active', pg===p);
+    document.getElementById('page-'+pg)?.classList.toggle('active', pg===p);
+  });
+  document.getElementById('topbar-title').textContent = PAGE_TITLES[p];
+  if (p==='dashboard') renderDashboard();
+  if (p==='projects')  renderProjects();
+  if (p==='reminders') renderReminders();
 }
 
-/* ── Tab switching ───────────────────────────────────────── */
-function switchPage(p) {
-  document.querySelectorAll('.nav-item').forEach((el, i) => {
-    el.classList.toggle('active', ['dashboard','projects','reminders','add'][i] === p);
-  });
-  document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
-  document.getElementById('page-' + p).classList.add('active');
-  document.getElementById('topbar-title').textContent = pageTitles[p];
-  if (p === 'dashboard') renderDashboard();
-  if (p === 'projects')  renderProjects();
-  if (p === 'reminders') renderReminders();
-}
 function setFilter(f, el) {
   filterStatus = f;
-  document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
   renderProjects();
 }
 function setFilterByKey(f) {
-  if (f === 'active') filterStatus = '__active__';
-  else filterStatus = f;
-  document.querySelectorAll('.filter-pill').forEach(b => {
-    const map = {all:'全部', bid:'押標金', awarded:'得標', performance:'履保金', warranty:'保固金', done:'已完成'};
-    const key = Object.keys(map).find(k => map[k] === b.textContent.trim()) || '';
-    b.classList.toggle('active', key === filterStatus || (filterStatus === '__active__' && key === 'all'));
-  });
+  filterStatus = f==='active' ? '__active__' : f;
+  // reset seg-btn UI to 全部
+  const all = document.querySelector('.seg-btn');
+  if (all) { document.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active')); all.classList.add('active'); }
   renderProjects();
 }
 
-/* ── Reminders ───────────────────────────────────────────── */
+/* ════════════════════════════════════════════════
+   REMINDERS
+════════════════════════════════════════════════ */
 function getReminders() {
   const items = [];
   projects.forEach(p => {
-    if (p.stage === 'done') return;
-    if (p.stage === 'awarded')
-      items.push({ label:'押標金待轉換為履保金', project:p.name, id:p.id, days:0, type:'action' });
-    const checks = [
-      { label:'押標金到期',       date:p.bidBondExp,    threshold:60,  type:'bid' },
-      { label:'押標金預計收回',   date:p.bidReturnDate, threshold:30,  type:'bid-return' },
-      { label:'履保金到期',       date:p.perfExpDate,   threshold:60,  type:'perf' },
-      { label:'預計履約日',       date:p.perfEstDate,   threshold:30,  type:'perf-est' },
-      { label:'保固金到期',       date:p.warExpDate,    threshold:60,  type:'war' },
-    ];
-    checks.forEach(c => {
+    if (p.stage==='done') return;
+    if (p.stage==='awarded') items.push({label:'押標金待轉換為履保金',project:p.name,id:p.id,days:0,type:'action'});
+    [
+      {label:'押標金到期',     date:p.bidBondExp,    threshold:60, type:'bid'},
+      {label:'押標金預計收回', date:p.bidReturnDate, threshold:30, type:'bid-return'},
+      {label:'履保金到期',     date:p.perfExpDate,   threshold:60, type:'perf'},
+      {label:'預計履約日',     date:p.perfEstDate,   threshold:30, type:'perf-est'},
+      {label:'保固金到期',     date:p.warExpDate,    threshold:60, type:'war'},
+    ].forEach(c => {
       if (!c.date) return;
       const d = daysDiff(c.date);
-      if (d !== null && d <= c.threshold)
-        items.push({ label:c.label, project:p.name, date:c.date, id:p.id, days:d, type:c.type });
+      if (d!==null && d<=c.threshold) items.push({label:c.label,project:p.name,date:c.date,id:p.id,days:d,type:c.type});
     });
     if (p.warExpDate) {
       const d = daysDiff(p.warExpDate);
-      if (d !== null && d >= 0 && d <= 31)
-        items.push({ label:'請申請保固金退還（截止前一個月）', project:p.name, date:p.warExpDate, id:p.id, days:d, type:'war-refund' });
+      if (d!==null && d>=0 && d<=31) items.push({label:'請申請保固金退還（截止前一個月）',project:p.name,date:p.warExpDate,id:p.id,days:d,type:'war-refund'});
     }
   });
-  return items.sort((a, b) => a.days - b.days);
+  return items.sort((a,b)=>a.days-b.days);
 }
 
-function riDotClass(r) {
-  if (r.type === 'action' || r.type === 'war-refund') return 'action';
-  if (r.days < 0 || r.days <= 14) return 'urgent';
-  if (r.days <= 30) return 'warning';
+function riClass(r) {
+  if (r.type==='action'||r.type==='war-refund') return 'action';
+  if (r.days<0||r.days<=14) return 'urgent';
+  if (r.days<=30) return 'warning';
   return 'info';
 }
-function riDayText(r) {
-  if (r.type === 'action') return '<span class="ri-days action">待處理</span>';
-  const d = r.days;
-  if (d < 0)  return `<span class="ri-days urgent">逾期 ${Math.abs(d)} 天</span>`;
-  if (d === 0) return '<span class="ri-days urgent">今天到期</span>';
-  const cls = d <= 14 ? 'urgent' : d <= 30 ? 'warning' : 'info';
-  return `<span class="ri-days ${cls}">${d} 天後</span>`;
+function riTagText(r) {
+  if (r.type==='action') return '<span class="ri-tag action">待處理</span>';
+  const d=r.days;
+  if (d<0)  return `<span class="ri-tag urgent">逾期 ${Math.abs(d)} 天</span>`;
+  if (d===0) return '<span class="ri-tag urgent">今天到期</span>';
+  const cls=d<=14?'urgent':d<=30?'warning':'info';
+  return `<span class="ri-tag ${cls}">${d} 天後</span>`;
+}
+function riIconSVG(cls) {
+  if (cls==='urgent') return '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>';
+  if (cls==='warning') return '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+  if (cls==='action')  return '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zm9.75-4.5C12.75 8.004 13.254 7.5 13.875 7.5h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625z"/></svg>';
+  return '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>';
 }
 function riHTML(r) {
-  return `<div class="ri-item" onclick="openProject('${r.id}')" style="cursor:pointer;">
-    <div class="ri-dot ${riDotClass(r)}"></div>
+  const cls = riClass(r);
+  return `<div class="ri-item" onclick="openProject('${r.id}')">
+    <div class="ri-icon ${cls}">${riIconSVG(cls)}</div>
     <div class="ri-body">
       <div class="ri-label">${esc(r.label)}</div>
-      <div class="ri-project">${esc(r.project)}${r.date ? ' ・ ' + fmtDate(r.date) : ''}</div>
+      <div class="ri-project">${esc(r.project)}${r.date?' · '+fmtDate(r.date):''}</div>
     </div>
-    ${riDayText(r)}
+    ${riTagText(r)}
   </div>`;
 }
 
-/* ── Dashboard ───────────────────────────────────────────── */
+/* ════════════════════════════════════════════════
+   DASHBOARD
+════════════════════════════════════════════════ */
 function renderDashboard() {
-  const total = projects.length;
-  const active = projects.filter(p => p.stage !== 'done').length;
-  const rem = getReminders();
-  const urgent = rem.filter(r => r.days <= 14 && r.type !== 'action' && r.type !== 'war-refund').length;
-  const warRefund = rem.filter(r => r.type === 'war-refund').length;
+  const total  = projects.length;
+  const active = projects.filter(p=>p.stage!=='done').length;
+  const rem    = getReminders();
+  const urgent = rem.filter(r=>r.days<=14&&r.type!=='action'&&r.type!=='war-refund').length;
+  const warRef = rem.filter(r=>r.type==='war-refund').length;
+
+  // Update reminder badge in sidebar
+  const badge = document.getElementById('reminder-badge');
+  const totalAlerts = urgent + warRef;
+  badge.style.display = totalAlerts > 0 ? '' : 'none';
+  badge.textContent = totalAlerts;
 
   document.getElementById('stats').innerHTML = `
-    <div class="stat-card blue" onclick="switchPage('projects');setFilterByKey('all')">
-      <div class="stat-icon"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg></div>
+    <div class="stat-card c-brand" onclick="switchPage('projects');setFilterByKey('all')">
+      <div class="stat-card-glow"></div>
+      <div class="stat-chip"><div class="stat-chip-dot"></div>全部標案</div>
       <div class="stat-value">${total}</div>
       <div class="stat-label">標案總數</div>
     </div>
-    <div class="stat-card teal" onclick="switchPage('projects');setFilterByKey('active')">
-      <div class="stat-icon"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div>
+    <div class="stat-card c-emerald" onclick="switchPage('projects');setFilterByKey('active')">
+      <div class="stat-card-glow"></div>
+      <div class="stat-chip"><div class="stat-chip-dot"></div>進行中</div>
       <div class="stat-value">${active}</div>
-      <div class="stat-label">進行中</div>
+      <div class="stat-label">進行中標案</div>
     </div>
-    <div class="stat-card amber" onclick="switchPage('reminders')">
-      <div class="stat-icon"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg></div>
+    <div class="stat-card c-amber" onclick="switchPage('reminders')">
+      <div class="stat-card-glow"></div>
+      <div class="stat-chip"><div class="stat-chip-dot"></div>需注意</div>
       <div class="stat-value">${urgent}</div>
       <div class="stat-label">緊急到期（14天內）</div>
     </div>
-    <div class="stat-card violet" onclick="switchPage('reminders')">
-      <div class="stat-icon"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
-      <div class="stat-value">${warRefund}</div>
+    <div class="stat-card c-violet" onclick="switchPage('reminders')">
+      <div class="stat-card-glow"></div>
+      <div class="stat-chip"><div class="stat-chip-dot"></div>申請中</div>
+      <div class="stat-value">${warRef}</div>
       <div class="stat-label">保固退還申請</div>
     </div>`;
 
-  const top = rem.slice(0, 6);
+  const top = rem.slice(0,6);
+  const remCount = document.getElementById('dash-rem-count');
+  if (remCount) remCount.textContent = top.length;
   document.getElementById('dash-reminders').innerHTML = top.length
-    ? top.map(r => riHTML(r)).join('')
-    : `<div class="empty"><svg class="empty-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><div class="empty-title">目前無待辦提醒</div></div>`;
+    ? '<div class="ri-list">'+top.map(r=>riHTML(r)).join('')+'</div>'
+    : `<div class="empty-state"><svg class="empty-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><div class="empty-title">目前無待辦提醒</div></div>`;
 
-  const recent = sortByBidDate(projects).slice(0, 5);
+  const recent = sortByBidDate(projects).slice(0,5);
+  const projCount = document.getElementById('dash-proj-count');
+  if (projCount) projCount.textContent = recent.length;
   document.getElementById('dash-projects').innerHTML = recent.length
-    ? recent.map(p => miniCard(p)).join('')
-    : `<div class="empty"><svg class="empty-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/></svg><div class="empty-title">尚未新增標案</div></div>`;
+    ? '<div class="projects-table">'+recent.map(p=>miniRow(p)).join('')+'</div>'
+    : `<div class="empty-state"><svg class="empty-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/></svg><div class="empty-title">尚未建立標案</div></div>`;
 }
 
-function miniCard(p) {
-  return `<div class="project-card" onclick="openProject('${p.id}')">
-    <div class="pc-header" style="margin:0;">
-      <div><div class="pc-name" style="font-size:14px">${esc(p.name)}</div><div class="pc-meta">${esc(p.client||'')}${p.owner?' ・ '+esc(p.owner):''}</div></div>
-      <span class="badge ${stageBadge(p.stage)}" style="font-size:11px">${stageLabel(p.stage)}</span>
+function miniRow(p) {
+  return `<div class="project-row" onclick="openProject('${p.id}')">
+    <div class="pr-indicator" style="background:${stageDot(p.stage)}"></div>
+    <div class="pr-info">
+      <div class="pr-name">${esc(p.name)}</div>
+      <div class="pr-meta">${esc(p.client||'—')}${p.owner?`<span class="pr-divider">·</span>${esc(p.owner)}`:''}</div>
     </div>
+    <span class="badge ${stageBadge(p.stage)}">${stageLabel(p.stage)}</span>
   </div>`;
 }
 
-/* ── Projects list ───────────────────────────────────────── */
+/* ════════════════════════════════════════════════
+   PROJECTS LIST
+════════════════════════════════════════════════ */
 function sortByBidDate(arr) {
-  return [...arr].sort((a, b) => {
-    const ad = a.bidDate ? new Date(a.bidDate).getTime() : 8640000000000000;
-    const bd = b.bidDate ? new Date(b.bidDate).getTime() : 8640000000000000;
-    if (ad !== bd) return ad - bd;
-    return String(b.createdAt || '').localeCompare(String(a.createdAt || ''));
+  return [...arr].sort((a,b)=>{
+    const ad=a.bidDate?new Date(a.bidDate).getTime():8640000000000000;
+    const bd=b.bidDate?new Date(b.bidDate).getTime():8640000000000000;
+    return ad!==bd ? ad-bd : String(b.createdAt||'').localeCompare(String(a.createdAt||''));
   });
 }
+
 function renderProjects() {
-  const q = ((document.getElementById('search-input') || {}).value || '').toLowerCase();
+  const q = ((document.getElementById('search-input')||{}).value||'').toLowerCase();
   const list = sortByBidDate(projects).filter(p => {
-    let ms;
-    if (filterStatus === '__active__') ms = p.stage !== 'done';
-    else ms = filterStatus === 'all' || p.stage === filterStatus;
-    const mq = !q || p.name.toLowerCase().includes(q) || (p.client || '').toLowerCase().includes(q);
+    const ms = filterStatus==='__active__' ? p.stage!=='done'
+             : filterStatus==='all' ? true : p.stage===filterStatus;
+    const mq = !q || p.name.toLowerCase().includes(q) || (p.client||'').toLowerCase().includes(q);
     return ms && mq;
   });
   const rem = getReminders();
-  const alertIds = new Set(rem.filter(r => r.days <= 14 && r.type !== 'action').map(r => r.id));
-  const warnIds  = new Set(rem.filter(r => r.days > 14 && r.days <= 30).map(r => r.id));
+  const alertIds = new Set(rem.filter(r=>r.days<=14&&r.type!=='action').map(r=>r.id));
+  const warnIds  = new Set(rem.filter(r=>r.days>14&&r.days<=30).map(r=>r.id));
   const el = document.getElementById('projects-list');
   if (!list.length) {
-    el.innerHTML = `<div class="empty"><svg class="empty-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg><div class="empty-title">無符合標案</div><div class="empty-sub">試試其他關鍵字或篩選條件</div></div>`;
+    el.innerHTML = `<div class="empty-state"><svg class="empty-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg><div class="empty-title">無符合標案</div><div class="empty-sub">試試其他關鍵字或篩選條件</div></div>`;
     return;
   }
-  el.innerHTML = list.map(p => {
-    const cls = alertIds.has(p.id) ? 'is-alert' : warnIds.has(p.id) ? 'is-warning' : '';
-    const bonds = [];
-    if (p.bidBond)  bonds.push(`<span class="bond-pill ${p.stage==='bid'?'active':''}"><span class="bp-type">押</span>${fmtMoney(p.bidBond)}</span>`);
-    if (p.perfBond) bonds.push(`<span class="bond-pill ${p.stage==='performance'?'active':''}"><span class="bp-type">履</span>${fmtMoney(p.perfBond)}</span>`);
-    if (p.warBond)  bonds.push(`<span class="bond-pill ${p.stage==='warranty'?'active':''}"><span class="bp-type">固</span>${fmtMoney(p.warBond)}</span>`);
-    const dates = [];
-    if (p.bidDate)     dates.push(`開標日期 <strong>${fmtDate(p.bidDate)}</strong>`);
-    if (p.bidBondExp)  dates.push(`押標金到期 <strong>${fmtDate(p.bidBondExp)}</strong>`);
-    if (p.perfExpDate) dates.push(`履保金到期 <strong>${fmtDate(p.perfExpDate)}</strong>`);
-    if (p.warExpDate)  dates.push(`保固截止 <strong>${fmtDate(p.warExpDate)}</strong>`);
-    return `<div class="project-card ${cls}" onclick="openProject('${p.id}')">
-      <div style="display:flex;align-items:flex-start;gap:1rem">
-        <div style="flex:1;min-width:0">
-          <div class="pc-name">${esc(p.name)}</div>
-          <div class="pc-meta" style="margin-bottom:12px">
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1v1H9V7zm5 0h1v1h-1V7zm-5 4h1v1H9v-1zm5 0h1v1h-1v-1zm-5 4h1v1H9v-1zm5 0h1v1h-1v-1z"/></svg>
-            ${esc(p.client||'')}
-            ${p.owner ? `<span style="margin:0 6px;color:var(--border)">|</span><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg> ${esc(p.owner)}` : ''}
-          </div>
-          ${bonds.length ? `<div class="bond-pills">${bonds.join('')}</div>` : ''}
-          ${dates.length ? `<div class="pc-dates">${dates.map(d=>`<div class="pc-date">${d}</div>`).join('')}</div>` : ''}
-        </div>
-        <div style="flex-shrink:0;">
-          <span class="badge ${stageBadge(p.stage)}">${stageLabel(p.stage)}</span>
-        </div>
+  el.innerHTML = '<div class="projects-table">' + list.map(p => {
+    const cls = alertIds.has(p.id)?'is-alert':warnIds.has(p.id)?'is-warning':'';
+
+    // Amount pills — stacked vertically, active = current stage
+    const amounts = [];
+    if (p.bidBond)  amounts.push(`<span class="amount-pill ${p.stage==='bid'?'active':''}"><span class="amount-pill-label">押</span>${fmtMoney(p.bidBond)}</span>`);
+    if (p.perfBond) amounts.push(`<span class="amount-pill ${p.stage==='performance'?'active':''}"><span class="amount-pill-label">履</span>${fmtMoney(p.perfBond)}</span>`);
+    if (p.warBond)  amounts.push(`<span class="amount-pill ${(p.stage==='warranty'||p.stage==='in_warranty')?'active':''}"><span class="amount-pill-label">固</span>${fmtMoney(p.warBond)}</span>`);
+
+    // Date cells with urgency colouring
+    function dateCell(label, dateStr) {
+      if (!dateStr) return '';
+      const d = daysDiff(dateStr);
+      const cls2 = d !== null && d <= 14 ? 'urgent' : d !== null && d <= 30 ? 'near' : '';
+      return `<div class="pr-date">
+        <div class="pr-date-label">${label}</div>
+        <div class="pr-date-val ${cls2}">${fmtDateShort(dateStr)}</div>
+      </div>`;
+    }
+    const dates = [
+      dateCell('押標到期', p.bidBondExp),
+      dateCell('履保到期', p.perfExpDate),
+      dateCell('保固截止', p.warExpDate),
+    ].filter(Boolean);
+
+    const arrowSVG = `<div class="pr-arrow"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></div>`;
+
+    return `<div class="project-row ${cls}" onclick="openProject('${p.id}')">
+      <div class="pr-indicator" style="background:${stageDot(p.stage)}"></div>
+      <div class="pr-info">
+        <div class="pr-name">${esc(p.name)}</div>
+        <div class="pr-meta">${esc(p.client||'—')}${p.owner?`<span class="pr-divider">·</span>${esc(p.owner)}`:''}</div>
       </div>
+      ${amounts.length ? `<div class="pr-amounts">${amounts.join('')}</div>` : '<div></div>'}
+      ${dates.length ? `<div class="pr-dates">${dates.join('')}</div>` : '<div></div>'}
+      <div class="pr-stage"><span class="badge ${stageBadge(p.stage)}">${stageLabel(p.stage)}</span>${arrowSVG}</div>
     </div>`;
-  }).join('');
+  }).join('') + '</div>';
 }
 
-/* ── Reminders page ──────────────────────────────────────── */
+/* ════════════════════════════════════════════════
+   REMINDERS PAGE
+════════════════════════════════════════════════ */
 function renderReminders() {
   const items = getReminders();
   document.getElementById('reminders-list').innerHTML = items.length
-    ? items.map(r => riHTML(r)).join('')
-    : `<div class="empty"><svg class="empty-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><div class="empty-title">目前無待辦提醒</div><div class="empty-sub">所有保證金均在安全期內</div></div>`;
+    ? '<div class="ri-list">'+items.map(r=>riHTML(r)).join('')+'</div>'
+    : `<div class="empty-state"><svg class="empty-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><div class="empty-title">目前無待辦提醒</div><div class="empty-sub">所有保證金均在安全期內</div></div>`;
 }
 
-/* ── Open project modal ──────────────────────────────────── */
+/* ════════════════════════════════════════════════
+   MODAL — openProject
+════════════════════════════════════════════════ */
 function openProject(id) {
-  const p = projects.find(x => x.id === id); if (!p) return;
+  const p = projects.find(x=>x.id===id); if (!p) return;
 
-  function opt(val, cur, label) { return `<option value="${val}"${cur===val?' selected':''}>${label}</option>`; }
-  function payOpt(cur, includeConvert = false) {
-    const convertOpt = includeConvert ? `<option${cur==='押標金轉履保金'?' selected':''}>押標金轉履保金</option>` : '';
-    return `<option value="">請選擇</option>${convertOpt}<option${cur==='匯款'?' selected':''}>匯款</option><option${cur==='支票'?' selected':''}>支票</option>`;
+  function opt(val,cur,label) { return `<option value="${val}"${cur===val?' selected':''}>${label}</option>`; }
+  function payOpt(cur, includeConvert=false) {
+    const conv = includeConvert ? `<option${cur==='押標金轉履保金'?' selected':''}>押標金轉履保金</option>` : '';
+    return `<option value="">請選擇</option>${conv}<option${cur==='匯款'?' selected':''}>匯款</option><option${cur==='支票'?' selected':''}>支票</option>`;
   }
   function ownerOpt(cur) {
-    const owners = ['Melissa', 'Willa', 'Annie'];
-    return `<option value="">請選擇</option>` + owners.map(o => `<option${cur===o?' selected':''}>${o}</option>`).join('');
+    return `<option value="">請選擇</option>` + ['Melissa','Willa','Annie'].map(o=>`<option${cur===o?' selected':''}>${o}</option>`).join('');
   }
-  function numField(fid, val, placeholder='') {
-    return `<input type="number" id="${fid}" value="${val||''}" placeholder="${placeholder}">`;
+  function numField(fid, val, ph='') {
+    return `<input type="number" id="${fid}" value="${val||''}" placeholder="${ph}" style="font-family:var(--mono)">`;
   }
-  function chkExpRow(rowId, expId, expVal, isVisible) {
-    return `<div class="cheque-exp-row form-grid-2${isVisible?' visible':''}" id="${rowId}" style="margin-top:1.25rem">
+  function chkRow(rowId, expId, expVal, show) {
+    return `<div class="cheque-exp-row grid-2${show?' visible':''}" id="${rowId}" style="margin-top:10px">
       <div class="field"><label>支票有效期限</label><input type="date" id="${expId}" value="${expVal||''}"></div>
     </div>`;
   }
+  function block(iconColor, iconSVG, title, content) {
+    return `<div class="form-block" style="padding-left:26px">
+      <div class="form-block-accent" style="background:${iconColor}"></div>
+      <div class="form-block-header">
+        <div class="form-block-icon" style="background:${iconColor}18">${iconSVG}</div>
+        <span class="form-block-title">${title}</span>
+      </div>${content}</div>`;
+  }
 
-  const stageOpts = ['bid','awarded','performance','in_warranty','warranty','done']
-    .map(s => opt(s, p.stage, stageLabel(s))).join('');
-  const warModeOpts = opt('new', p.warrantyMode, '另繳保固金') + opt('convert', p.warrantyMode, '履保金轉保固金（差額退還）');
+  const stageOpts = ['bid','awarded','performance','in_warranty','warranty','done'].map(s=>opt(s,p.stage,stageLabel(s))).join('');
+  const warModeOpts = opt('new',p.warrantyMode,'另繳保固金') + opt('convert',p.warrantyMode,'履保金轉保固金（差額退還）');
 
   const warDay = p.warExpDate ? daysDiff(p.warExpDate) : null;
-  const warNote = (warDay !== null && warDay >= 0 && warDay <= 31)
-    ? `<div class="notice warning"><div class="notice-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg></div><div>保固截止前一個月，請儘速申請保固金退還！（剩 ${warDay} 天）</div></div>` : '';
-  const awardedNote = p.stage === 'awarded'
-    ? `<div class="notice info"><div class="notice-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div>已得標待繳履保金：請填寫履保金資料後，將階段更改為「已履約：已支付履保金」</div></div>` : '';
+  const warNote = warDay!==null&&warDay>=0&&warDay<=31
+    ? `<div class="notice warning" style="margin:0 20px 0;"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg><span>保固截止前一個月，請儘速申請保固金退還！（剩 <strong>${warDay}</strong> 天）</span></div>` : '';
+  const awardedNote = p.stage==='awarded'
+    ? `<div class="notice info" style="margin:0 20px 0"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span>已得標待繳履保金：請填入履保金資料後更新階段。</span></div>` : '';
 
-  const histHTML = p.history && p.history.length
-    ? `<div class="form-section" style="margin-top:2rem"><div class="form-section-title">異動紀錄</div>
-       <div class="history-list">${p.history.map(h=>`<div class="history-item">${esc(h)}</div>`).join('')}</div></div>` : '';
+  const histHTML = p.history&&p.history.length
+    ? `<div class="form-block">
+        <div class="form-block-header">
+          <div class="form-block-icon" style="background:var(--slate-bg)"><svg width="13" height="13" fill="none" stroke="var(--slate)" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"/></svg></div>
+          <span class="form-block-title">異動紀錄</span>
+        </div>
+        <div class="history-list">${[...p.history].reverse().map(h=>{
+          const sp=h.indexOf(' ');
+          const sp2=h.indexOf(' ',sp+1);
+          const time=sp2>0?h.slice(0,sp2):h.slice(0,sp>0?sp:10);
+          const text=sp2>0?h.slice(sp2+1):h.slice(sp+1);
+          return `<div class="history-entry"><div class="history-entry-dot"></div><div class="history-entry-time">${esc(time)}</div><div class="history-entry-text">${esc(text)}</div></div>`;
+        }).join('')}</div>
+      </div>` : '';
+
+  const infoIcon = `<svg width="13" height="13" fill="none" stroke="var(--brand)" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>`;
+  const moneyIcon = color => `<svg width="13" height="13" fill="none" stroke="${color}" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
 
   document.getElementById('modal-root').innerHTML = `
   <div class="modal-overlay" id="modal-overlay" onclick="if(event.target.id==='modal-overlay')closeModal()">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-title">${esc(p.name)}</div>
-      <button class="modal-close" onclick="closeModal()"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+      <div class="modal-title-row">
+        <div style="width:8px;height:8px;border-radius:50%;background:${stageDot(p.stage)};flex-shrink:0"></div>
+        <span class="modal-title">${esc(p.name)}</span>
+        <span class="badge ${stageBadge(p.stage)}" style="margin-left:4px">${stageLabel(p.stage)}</span>
+      </div>
+      <button class="modal-close" onclick="closeModal()"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
     </div>
 
-    ${warNote}${awardedNote}
+    ${warNote ? `<div style="padding:12px 0 0">${warNote}</div>` : ''}
+    ${awardedNote ? `<div style="padding:12px 0 0">${awardedNote}</div>` : ''}
 
-    <div class="form-section">
-      <div class="form-section-title">基本資訊</div>
-      <div class="form-grid-3" style="margin-bottom:1.25rem">
+    ${block('var(--brand)', infoIcon, '基本資訊', `
+      <div class="grid-3" style="margin-bottom:10px">
         <div class="field"><label>標案名稱</label><input id="e-name" value="${esc(p.name||'')}"></div>
         <div class="field"><label>客戶 / 業主</label><input id="e-client" value="${esc(p.client||'')}"></div>
-        <div class="field"><label>業務負責人</label><select id="e-owner">${ownerOpt(p.owner)}</select></div>
+        <div class="field"><label>業務負責人</label><div class="sel-wrap"><select id="e-owner">${ownerOpt(p.owner)}</select></div></div>
       </div>
-      <div class="form-grid-3">
+      <div class="grid-3">
         <div class="field"><label>開標日期</label><input type="date" id="e-bid-date" value="${p.bidDate||''}"></div>
-        <div class="field"><label>標案金額（元）</label>${numField('e-amount', p.amount, '0')}</div>
-      </div>
-    </div>
+        <div class="field"><label>標案金額（元）</label>${numField('e-amount',p.amount,'0')}</div>
+        <div class="field"><label>備註</label><input id="e-note" value="${esc(p.note||'')}"></div>
+      </div>`)}
 
-    <div class="form-section">
-      <div class="form-section-title">押標金</div>
-      <div class="form-grid-4" style="margin-bottom:1.25rem">
+    ${block('var(--brand)', moneyIcon('var(--brand)'), '押標金', `
+      <div class="grid-4" style="margin-bottom:0">
         <div class="field"><label>申請日期</label><input type="date" id="e-bid-apply-date" value="${p.bidApplyDate||''}"></div>
-        <div class="field"><label>押標金金額（元）</label>${numField('e-bid-bond', p.bidBond)}</div>
-        <div class="field"><label>繳納方式</label><select id="e-bid-pay" onchange="toggleChequeExp('e-bid-pay','bid-chk-row')">${payOpt(p.bidPay)}</select></div>
+        <div class="field"><label>押標金金額（元）</label>${numField('e-bid-bond',p.bidBond)}</div>
+        <div class="field"><label>繳納方式</label><div class="sel-wrap"><select id="e-bid-pay" onchange="toggleChequeExp('e-bid-pay','bid-chk-row')">${payOpt(p.bidPay)}</select></div></div>
         <div class="field"><label>預計收回日</label><input type="date" id="e-bid-return" value="${p.bidReturnDate||''}"></div>
       </div>
-      ${chkExpRow('bid-chk-row','e-bid-exp', p.bidBondExp, p.bidPay==='支票')}
-      <div class="form-grid-2" style="margin-top:1.25rem">
-        <div class="field"><label>備註</label><input id="e-note" value="${esc(p.note||'')}"></div>
-      </div>
-    </div>
+      ${chkRow('bid-chk-row','e-bid-exp',p.bidBondExp,p.bidPay==='支票')}`)}
 
-    <div class="form-section">
-      <div class="form-section-title">履保金</div>
-      <div class="form-grid-3" style="margin-bottom:1.25rem">
-        <div class="field"><label>履保金金額（元）</label>${numField('e-perf-bond', p.perfBond)}</div>
-        <div class="field"><label>繳納方式</label><select id="e-perf-pay" onchange="toggleChequeExp('e-perf-pay','perf-chk-row')">${payOpt(p.perfPay, true)}</select></div>
+    ${block('var(--emerald)', moneyIcon('var(--emerald)'), '履保金', `
+      <div class="grid-3" style="margin-bottom:0">
+        <div class="field"><label>履保金金額（元）</label>${numField('e-perf-bond',p.perfBond)}</div>
+        <div class="field"><label>繳納方式</label><div class="sel-wrap"><select id="e-perf-pay" onchange="toggleChequeExp('e-perf-pay','perf-chk-row')">${payOpt(p.perfPay,true)}</select></div></div>
         <div class="field"><label>預計履約日</label><input type="date" id="e-perf-est" value="${p.perfEstDate||''}"></div>
         <div class="field"><label>實際履約完成日</label><input type="date" id="e-perf-done" value="${p.perfDoneDate||''}"></div>
       </div>
-      ${chkExpRow('perf-chk-row','e-perf-exp', p.perfExpDate, p.perfPay==='支票')}
-    </div>
+      ${chkRow('perf-chk-row','e-perf-exp',p.perfExpDate,p.perfPay==='支票')}`)}
 
-    <div class="form-section">
-      <div class="form-section-title">保固金</div>
-      <div class="form-grid-3" style="margin-bottom:1.25rem">
-        <div class="field"><label>保固金模式</label><select id="e-war-mode">${warModeOpts}</select></div>
-        <div class="field"><label>繳納方式</label><select id="e-war-pay" onchange="toggleChequeExp('e-war-pay','war-chk-row')">${payOpt(p.warPay)}</select></div>
+    ${block('var(--violet)', moneyIcon('var(--violet)'), '保固金', `
+      <div class="grid-3" style="margin-bottom:0">
+        <div class="field"><label>保固金模式</label><div class="sel-wrap"><select id="e-war-mode">${warModeOpts}</select></div></div>
+        <div class="field"><label>繳納方式</label><div class="sel-wrap"><select id="e-war-pay" onchange="toggleChequeExp('e-war-pay','war-chk-row')">${payOpt(p.warPay)}</select></div></div>
         <div class="field"><label>保固截止日期</label><input type="date" id="e-war-exp" value="${p.warExpDate||''}"></div>
       </div>
-      ${chkExpRow('war-chk-row','e-war-chk-exp', p.warChkExp, p.warPay==='支票')}
-      <div class="form-grid-3" style="margin-top:1.25rem">
-        <div class="field"><label>保固金金額（元）</label>${numField('e-war-bond', p.warBond)}</div>
-        <div class="field"><label>退還差額（元）</label>${numField('e-war-refund', p.warRefund, '履保轉保固填寫')}</div>
+      ${chkRow('war-chk-row','e-war-chk-exp',p.warChkExp,p.warPay==='支票')}
+      <div class="grid-3" style="margin-top:10px">
+        <div class="field"><label>保固金金額（元）</label>${numField('e-war-bond',p.warBond)}</div>
+        <div class="field"><label>退還差額（元）</label>${numField('e-war-refund',p.warRefund,'履保轉保固填寫')}</div>
         <div class="field"><label>退還申請日</label><input type="date" id="e-war-refund-date" value="${p.warRefundDate||''}"></div>
-      </div>
-    </div>
+      </div>`)}
 
     ${histHTML}
 
-    <div class="stage-select-bar">
-      <label>標案目前階段</label>
-      <select id="e-stage">${stageOpts}</select>
+    <div class="stage-footer">
+      <span class="stage-footer-label">目前階段</span>
+      <div class="stage-footer-wrap"><select id="e-stage">${stageOpts}</select></div>
     </div>
 
     <div class="action-bar">
       <div class="action-bar-left">
-        <button class="btn btn-danger" onclick="deleteProject('${p.id}')">刪除標案</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteProject('${p.id}')">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+          刪除標案
+        </button>
       </div>
-      <button class="btn" onclick="closeModal()">取消</button>
-      <button class="btn btn-primary" id="save-btn" onclick="saveProject('${p.id}')">儲存變更</button>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">取消</button>
+      <button class="btn btn-primary btn-sm" id="save-btn" onclick="saveProject('${p.id}')">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+        儲存變更
+      </button>
     </div>
   </div></div>`;
 }
 
-/* ── Now datetime string (client-side, for history) ─────── */
-function nowDateTimeStr() {
-  const d = new Date();
-  const pad = n => String(n).padStart(2, '0');
-  return `${d.getFullYear()}/${pad(d.getMonth()+1)}/${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-}
-
-/* ── Cheque expiry toggle (add form) ────────────────────── */
+/* ════════════════════════════════════════════════
+   CHEQUE TOGGLE
+════════════════════════════════════════════════ */
 function toggleChequeExpAdd() {
-  const sel = document.getElementById('f-bid-pay');
-  const row = document.getElementById('f-bid-chk-row');
-  if (!sel || !row) return;
-  row.classList.toggle('visible', sel.value === '支票');
+  const sel=document.getElementById('f-bid-pay');
+  const row=document.getElementById('f-bid-chk-row');
+  if(sel&&row) row.classList.toggle('visible',sel.value==='支票');
+}
+function toggleChequeExp(selectId,rowId) {
+  const sel=document.getElementById(selectId);
+  const row=document.getElementById(rowId);
+  if(sel&&row) row.classList.toggle('visible',sel.value==='支票');
 }
 
-/* ── Cheque expiry toggle (modal) ────────────────────────── */
-function toggleChequeExp(selectId, rowId) {
-  const sel = document.getElementById(selectId);
-  const row = document.getElementById(rowId);
-  if (!sel || !row) return;
-  row.classList.toggle('visible', sel.value === '支票');
-}
-
-/* ── Save project ────────────────────────────────────────── */
+/* ════════════════════════════════════════════════
+   SAVE PROJECT
+════════════════════════════════════════════════ */
 async function saveProject(id) {
-  const p = projects.find(x => x.id === id); if (!p) return;
+  const p = projects.find(x=>x.id===id); if (!p) return;
   const btn = document.getElementById('save-btn');
-  btn.disabled = true; btn.textContent = '儲存中...';
+  btn.disabled=true; btn.innerHTML='<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="animation:spin .6s linear infinite"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>儲存中...';
 
   const oldStage = p.stage;
-  const fields = {
-    name: 'e-name', client: 'e-client', owner: 'e-owner',
-    bidDate: 'e-bid-date', amount: 'e-amount', note: 'e-note', stage: 'e-stage',
-    bidApplyDate: 'e-bid-apply-date', bidBond: 'e-bid-bond', bidPay: 'e-bid-pay',
-    bidBondExp: 'e-bid-exp',
-    bidReturnDate: 'e-bid-return',
-    perfBond: 'e-perf-bond', perfPay: 'e-perf-pay',
-    perfExpDate: 'e-perf-exp',
-    perfEstDate: 'e-perf-est', perfDoneDate: 'e-perf-done',
-    warrantyMode: 'e-war-mode', warPay: 'e-war-pay', warExpDate: 'e-war-exp',
-    warChkExp: 'e-war-chk-exp',
-    warBond: 'e-war-bond', warRefund: 'e-war-refund', warRefundDate: 'e-war-refund-date',
+  const fieldMap = {
+    name:'e-name', client:'e-client', owner:'e-owner',
+    bidDate:'e-bid-date', amount:'e-amount', note:'e-note', stage:'e-stage',
+    bidApplyDate:'e-bid-apply-date', bidBond:'e-bid-bond', bidPay:'e-bid-pay',
+    bidBondExp:'e-bid-exp', bidReturnDate:'e-bid-return',
+    perfBond:'e-perf-bond', perfPay:'e-perf-pay',
+    perfExpDate:'e-perf-exp', perfEstDate:'e-perf-est', perfDoneDate:'e-perf-done',
+    warrantyMode:'e-war-mode', warPay:'e-war-pay', warExpDate:'e-war-exp',
+    warChkExp:'e-war-chk-exp',
+    warBond:'e-war-bond', warRefund:'e-war-refund', warRefundDate:'e-war-refund-date',
   };
-  Object.entries(fields).forEach(([k, elId]) => {
-    const e = document.getElementById(elId);
-    if (e) p[k] = e.value;
-  });
-  
-  if (oldStage !== p.stage) {
-    if (!p.history) p.history = [];
-    p.history.push(nowDateTimeStr() + ' 階段變更：' + stageLabel(oldStage) + ' → ' + stageLabel(p.stage));
+  Object.entries(fieldMap).forEach(([k,elId])=>{ const e=document.getElementById(elId); if(e) p[k]=e.value; });
+  if (oldStage!==p.stage) {
+    if (!p.history) p.history=[];
+    p.history.push(nowDateTimeStr()+' 階段變更：'+stageLabel(oldStage)+' → '+stageLabel(p.stage));
   }
-
-  const result = await apiPost('update', { project: p });
-  btn.disabled = false; btn.textContent = '儲存變更';
-  if (result !== null) {
-    toast('變更已成功儲存', 'success');
-    closeModal();
-    renderDashboard();
-    renderProjects();
-  }
+  const result = await apiPost('update',{project:p});
+  btn.disabled=false; btn.innerHTML='<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>儲存變更';
+  if (result!==null) { toast('變更已儲存','success'); closeModal(); renderDashboard(); renderProjects(); }
 }
 
-/* ── Delete project ──────────────────────────────────────── */
+/* ════════════════════════════════════════════════
+   DELETE PROJECT
+════════════════════════════════════════════════ */
 async function deleteProject(id) {
   if (!confirm('確定要刪除此標案？此動作無法復原。')) return;
-  const result = await apiPost('delete', { id });
-  if (result !== null) {
-    projects = projects.filter(p => p.id !== id);
-    toast('標案已刪除', 'success');
-    closeModal();
-    renderDashboard();
-    renderProjects();
+  const result = await apiPost('delete',{id});
+  if (result!==null) {
+    projects=projects.filter(p=>p.id!==id);
+    toast('標案已刪除');
+    closeModal(); renderDashboard(); renderProjects();
   }
 }
+function closeModal() { document.getElementById('modal-root').innerHTML=''; }
 
-function closeModal() { document.getElementById('modal-root').innerHTML = ''; }
-
-/* ── Add project ─────────────────────────────────────────── */
+/* ════════════════════════════════════════════════
+   ADD PROJECT
+════════════════════════════════════════════════ */
 async function addProject() {
-  const name = document.getElementById('f-name').value.trim();
-  if (!name) { toast('請填寫標案名稱', 'error'); return; }
-
-  const btn = document.querySelector('#page-add .btn-primary');
-  btn.disabled = true; btn.textContent = '建立中...';
-
-  const p = {
-    id: uid(), name,
-    client:        document.getElementById('f-client').value,
-    owner:         document.getElementById('f-owner').value,
-    bidDate:       document.getElementById('f-bid-date').value,
-    amount:        document.getElementById('f-amount').value,
-    note:          document.getElementById('f-note').value,
-    stage:         document.getElementById('f-stage').value,
-    bidApplyDate:  document.getElementById('f-bid-apply-date').value,
-    bidBond:       document.getElementById('f-bid-bond').value,
-    bidPay:        document.getElementById('f-bid-pay').value,
-    bidBondExp:    document.getElementById('f-bid-exp').value,
-    bidReturnDate: document.getElementById('f-bid-return').value,
-    history:       [nowDateTimeStr() + ' 建立標案'],
+  const name=document.getElementById('f-name').value.trim();
+  if (!name) { toast('請填寫標案名稱','error'); return; }
+  const btn=document.querySelector('#page-add .btn-primary');
+  btn.disabled=true; btn.textContent='建立中...';
+  const p={
+    id:uid(), name,
+    client: document.getElementById('f-client').value,
+    owner:  document.getElementById('f-owner').value,
+    bidDate:document.getElementById('f-bid-date').value,
+    amount: document.getElementById('f-amount').value,
+    note:   document.getElementById('f-note').value,
+    stage:  document.getElementById('f-stage').value,
+    bidApplyDate: document.getElementById('f-bid-apply-date').value,
+    bidBond:      document.getElementById('f-bid-bond').value,
+    bidPay:       document.getElementById('f-bid-pay').value,
+    bidBondExp:   document.getElementById('f-bid-exp').value,
+    bidReturnDate:document.getElementById('f-bid-return').value,
+    history:[nowDateTimeStr()+' 建立標案'],
   };
-
-  const result = await apiPost('create', { project: p });
-  btn.disabled = false; btn.textContent = '建立標案';
-
-  if (result !== null) {
+  const result=await apiPost('create',{project:p});
+  btn.disabled=false; btn.textContent='建立標案';
+  if (result!==null) {
     projects.push(p);
-    toast('標案已成功建立', 'success');
-    clearAddForm();
-    switchPage('projects');
+    toast('標案已建立','success');
+    clearAddForm(); switchPage('projects');
   }
 }
 
 function clearAddForm() {
   ['f-name','f-client','f-owner','f-bid-date','f-amount','f-note','f-bid-apply-date','f-bid-bond','f-bid-exp','f-bid-return']
-    .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-  document.getElementById('f-bid-pay').value = '';
-  document.getElementById('f-stage').value = 'bid';
-  const chkRow = document.getElementById('f-bid-chk-row');
-  if (chkRow) chkRow.classList.remove('visible');
+    .forEach(id=>{ const e=document.getElementById(id); if(e) e.value=''; });
+  document.getElementById('f-bid-pay').value='';
+  document.getElementById('f-stage').value='bid';
+  const r=document.getElementById('f-bid-chk-row'); if(r) r.classList.remove('visible');
 }
 
-/* ── Load data ───────────────────────────────────────────── */
+/* ════════════════════════════════════════════════
+   SKELETON GENERATORS
+════════════════════════════════════════════════ */
+function skRows(n) {
+  const widths = ['65%','80%','55%','72%','60%'];
+  return Array.from({length:n}, (_,i) => `
+    <div class="sk-row">
+      <div class="sk sk-dot"></div>
+      <div class="sk-info">
+        <div class="sk sk-line" style="width:${widths[i%5]}"></div>
+        <div class="sk sk-line" style="width:40%;margin-top:2px;opacity:.6"></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <div class="sk" style="width:60px;height:18px;border-radius:4px"></div>
+        <div class="sk" style="width:60px;height:18px;border-radius:4px;opacity:.5"></div>
+      </div>
+      <div class="sk sk-badge"></div>
+    </div>`).join('');
+}
+function skStats() {
+  return ['c-brand','c-emerald','c-amber','c-violet'].map(c => `
+    <div class="sk-stat">
+      <div class="sk sk-chip"></div>
+      <div class="sk sk-num"></div>
+      <div class="sk sk-label"></div>
+    </div>`).join('');
+}
+function skRiItems(n) {
+  return Array.from({length:n}, (_,i) => `
+    <div class="sk-ri">
+      <div class="sk sk-icon-sq"></div>
+      <div class="sk-ri-body">
+        <div class="sk sk-line" style="width:${55+i*8}%"></div>
+        <div class="sk sk-line" style="width:35%;opacity:.5;margin-top:2px"></div>
+      </div>
+      <div class="sk sk-tag"></div>
+    </div>`).join('');
+}
+
+function showSkeletons() {
+  // Stats
+  document.getElementById('stats').innerHTML = skStats();
+  // Dashboard cards
+  document.getElementById('dash-projects').innerHTML = `<div class="projects-table">${skRows(4)}</div>`;
+  document.getElementById('dash-reminders').innerHTML = skRiItems(4);
+  // Projects page
+  document.getElementById('projects-list').innerHTML = `<div class="projects-table">${skRows(6)}</div>`;
+  // Reminders page
+  document.getElementById('reminders-list').innerHTML = skRiItems(5);
+}
+
+/* ════════════════════════════════════════════════
+   LOAD
+════════════════════════════════════════════════ */
 async function loadProjects() {
+  showSkeletons();
   const data = await apiGet();
   if (data !== null) {
     projects = data;
@@ -1322,12 +1691,12 @@ async function loadProjects() {
   }
 }
 
-/* ── Keyboard shortcuts ──────────────────────────────────── */
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeModal();
-});
+// Add spin keyframe
+const style=document.createElement('style');
+style.textContent='@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}';
+document.head.appendChild(style);
 
-/* ── Init ────────────────────────────────────────────────── */
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
 loadProjects();
 </script>
 </body>
