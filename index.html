@@ -438,7 +438,7 @@ body::before { display: none; }
 /* ── Table column header ── */
 .pr-table-header {
   display: grid;
-  grid-template-columns: 8px 1fr 180px 220px 210px;
+  grid-template-columns: 8px 1fr 160px 300px 200px;
   gap: 0 14px;
   padding: 7px 20px;
   border-bottom: 1px solid var(--border);
@@ -469,8 +469,8 @@ body::before { display: none; }
 
 .project-row {
   display: grid;
-  /* indicator | name | amounts(fixed) | dates(fixed) | stage(fixed) */
-  grid-template-columns: 8px 1fr 180px 220px 210px;
+  /* indicator | name | amounts | dates | stage */
+  grid-template-columns: 8px 1fr 160px 300px 200px;
   align-items: center;
   gap: 0 14px;
   padding: 0 20px;
@@ -522,7 +522,7 @@ body::before { display: none; }
   font-family: var(--mono); color: var(--text-3); white-space: nowrap;
   line-height: 1.5;
   /* fixed width so pills align vertically across rows */
-  min-width: 130px; justify-content: space-between;
+  min-width: 120px; justify-content: space-between;
 }
 .amount-pill.active {
   border-color: rgba(79,95,247,.22);
@@ -536,15 +536,14 @@ body::before { display: none; }
 .amount-pill.active .amount-pill-label { opacity: .7; color: var(--brand); }
 .amount-pill-val { font-family: var(--mono); }
 
-/* ── Dates column — fixed 220px, uses mini-table inside ── */
+/* ── Dates column — fixed 300px, 3 equal slots ── */
 .pr-dates {
   display: grid;
-  /* 3 equal date slots, always same width */
   grid-template-columns: repeat(3, 1fr);
   gap: 0;
   padding: 12px 0 12px 14px;
   border-left: 1px solid var(--border);
-  width: 220px;
+  width: 300px;
 }
 .pr-date { text-align: center; }
 .pr-date-label {
@@ -561,9 +560,9 @@ body::before { display: none; }
 .pr-date-val.urgent { color: var(--rose); font-weight: 700; }
 .pr-date-empty { /* placeholder to keep 3-col grid intact */ }
 
-/* ── Stage column — fixed 210px, right side ── */
+/* ── Stage column — fixed 200px, right side ── */
 .pr-stage {
-  width: 210px;
+  width: 200px;
   display: flex; align-items: center; justify-content: flex-end;
   gap: 8px;
   padding: 12px 0;
@@ -721,6 +720,21 @@ body::before { display: none; }
 
 .cheque-exp-row { display: none; }
 .cheque-exp-row.visible { display: grid; animation: pgIn .18s var(--ease); margin-top: 12px; }
+
+/* ── Mail reminder chip in form blocks ── */
+.mail-remind-chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 6px 12px; border-radius: var(--r-full);
+  font-size: 11.5px; font-weight: 500;
+  border: 1px dashed;
+  margin-top: 12px; cursor: default;
+}
+.mail-remind-chip svg { flex-shrink: 0; }
+.mail-remind-chip strong { font-weight: 700; }
+.mail-remind-chip.c-brand   { color: var(--brand);   border-color: rgba(79,95,247,.35);  background: var(--brand-bg); }
+.mail-remind-chip.c-emerald { color: var(--emerald); border-color: rgba(5,150,105,.35);  background: var(--emerald-bg); }
+.mail-remind-chip.c-violet  { color: var(--violet);  border-color: rgba(124,58,237,.35); background: var(--violet-bg); }
+.mail-remind-chip.no-date   { color: var(--text-3);  border-color: var(--border-2);      background: var(--surface-2); font-style: italic; }
 .stage-footer {
   padding: 16px 20px;
   background: var(--surface-2);
@@ -1159,8 +1173,13 @@ function fmtMoney(n) { if(!n&&n!==0) return '—'; return Number(n).toLocaleStri
 function fmtDate(d) { return d ? d.replace(/-/g,'/') : '—'; }
 function fmtDateShort(d) {
   if (!d) return '—';
+  // return full yyyy/mm/dd — strip leading zeros from month/day for compactness
   const parts = d.replace(/-/g,'/').split('/');
-  return parts.length===3 ? parts[1]+'/'+parts[2] : d;
+  if (parts.length !== 3) return d;
+  const y = parts[0];
+  const m = String(Number(parts[1]));
+  const day = String(Number(parts[2]));
+  return `${y}/${m}/${day}`;
 }
 function daysDiff(d) {
   if (!d) return null;
@@ -1386,7 +1405,7 @@ function renderProjects() {
     <div class="pr-th">標案名稱</div>
     <div class="pr-th pr-th-r">金額</div>
     <div class="pr-th pr-th-dates">
-      <span>押標到期</span><span>履保到期</span><span>保固截止</span>
+      <span>押標收回日</span><span>履約完成日</span><span>保固截止</span>
     </div>
     <div class="pr-th pr-th-r">階段</div>
   </div>` +
@@ -1403,14 +1422,14 @@ function renderProjects() {
       amountPill('履', p.perfBond, p.stage==='performance') +
       amountPill('固', p.warBond,  p.stage==='warranty'||p.stage==='in_warranty');
 
-    // Date cells — always 3 slots, empty slot keeps grid structure
+    // Date cells — always 3 slots: 押標收回日 / 履約完成日 / 保固截止
     function dateCell(dateStr) {
       if (!dateStr) return `<div class="pr-date pr-date-empty"><div class="pr-date-val">—</div></div>`;
       const d = daysDiff(dateStr);
       const vc = d !== null && d <= 14 ? 'urgent' : d !== null && d <= 30 ? 'near' : '';
       return `<div class="pr-date"><div class="pr-date-val ${vc}">${fmtDateShort(dateStr)}</div></div>`;
     }
-    const datesHTML = dateCell(p.bidBondExp) + dateCell(p.perfExpDate) + dateCell(p.warExpDate);
+    const datesHTML = dateCell(p.bidReturnDate) + dateCell(p.perfDoneDate) + dateCell(p.warExpDate);
 
     const arrowSVG = `<div class="pr-arrow"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></div>`;
 
@@ -1472,6 +1491,21 @@ function openProject(id) {
   const stageOpts = ['bid','awarded','performance','in_warranty','warranty','done'].map(s=>opt(s,p.stage,stageLabel(s))).join('');
   const warModeOpts = opt('new',p.warrantyMode,'另繳保固金') + opt('convert',p.warrantyMode,'履保金轉保固金（差額退還）');
 
+  // Mail 提醒 icon
+  const mailSVG = `<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>`;
+
+  const bidRemindChip = p.bidReturnDate
+    ? `<div class="mail-remind-chip c-brand">${mailSVG} Mail 提醒：<strong>${fmtDate(p.bidReturnDate)}</strong> 後 <strong>1 天</strong>自動通知申請領回押標金</div>`
+    : `<div class="mail-remind-chip no-date">${mailSVG} 填寫「預計收回日」後自動設定 Mail 提醒</div>`;
+
+  const perfRemindChip = p.perfDoneDate
+    ? `<div class="mail-remind-chip c-emerald">${mailSVG} Mail 提醒：<strong>${fmtDate(p.perfDoneDate)}</strong> 後 <strong>5 天</strong>自動通知申請領回履保金</div>`
+    : `<div class="mail-remind-chip no-date">${mailSVG} 填寫「實際履約完成日」後自動設定 Mail 提醒</div>`;
+
+  const warRemindChip = p.warExpDate
+    ? `<div class="mail-remind-chip c-violet">${mailSVG} Mail 提醒：<strong>${fmtDate(p.warExpDate)}</strong> 前 <strong>10 天</strong>自動通知申請退還保固金</div>`
+    : `<div class="mail-remind-chip no-date">${mailSVG} 填寫「保固截止日期」後自動設定 Mail 提醒</div>`;
+
   const warDay = p.warExpDate ? daysDiff(p.warExpDate) : null;
   const warNote = warDay!==null&&warDay>=0&&warDay<=31
     ? `<div class="notice warning" style="margin:0 20px 0;"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg><span>保固截止前一個月，請儘速申請保固金退還！（剩 <strong>${warDay}</strong> 天）</span></div>` : '';
@@ -1530,7 +1564,8 @@ function openProject(id) {
         <div class="field"><label>繳納方式</label><div class="sel-wrap"><select id="e-bid-pay" onchange="toggleChequeExp('e-bid-pay','bid-chk-row')">${payOpt(p.bidPay)}</select></div></div>
         <div class="field"><label>預計收回日</label><input type="date" id="e-bid-return" value="${p.bidReturnDate||''}"></div>
       </div>
-      ${chkRow('bid-chk-row','e-bid-exp',p.bidBondExp,p.bidPay==='支票')}`)}
+      ${chkRow('bid-chk-row','e-bid-exp',p.bidBondExp,p.bidPay==='支票')}
+      ${bidRemindChip}`)}
 
     ${block('var(--emerald)', moneyIcon('var(--emerald)'), '履保金', `
       <div class="grid-3" style="margin-bottom:0">
@@ -1539,7 +1574,8 @@ function openProject(id) {
         <div class="field"><label>預計履約日</label><input type="date" id="e-perf-est" value="${p.perfEstDate||''}"></div>
         <div class="field"><label>實際履約完成日</label><input type="date" id="e-perf-done" value="${p.perfDoneDate||''}"></div>
       </div>
-      ${chkRow('perf-chk-row','e-perf-exp',p.perfExpDate,p.perfPay==='支票')}`)}
+      ${chkRow('perf-chk-row','e-perf-exp',p.perfExpDate,p.perfPay==='支票')}
+      ${perfRemindChip}`)}
 
     ${block('var(--violet)', moneyIcon('var(--violet)'), '保固金', `
       <div class="grid-3" style="margin-bottom:0">
@@ -1552,7 +1588,8 @@ function openProject(id) {
         <div class="field"><label>保固金金額（元）</label>${numField('e-war-bond',p.warBond)}</div>
         <div class="field"><label>退還差額（元）</label>${numField('e-war-refund',p.warRefund,'履保轉保固填寫')}</div>
         <div class="field"><label>退還申請日</label><input type="date" id="e-war-refund-date" value="${p.warRefundDate||''}"></div>
-      </div>`)}
+      </div>
+      ${warRemindChip}`)}
 
     ${histHTML}
 
