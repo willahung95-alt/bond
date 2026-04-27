@@ -296,33 +296,6 @@ body::before { display: none; }
 .card-body { padding: 16px 20px; }
 
 /* ═══════════════════════════════════════════
-   PROJECT CARDS (LIST)
-═══════════════════════════════════════════ */
-.projects-table { display: flex; flex-direction: column; gap: 0; }
-.project-row {
-  display: flex; align-items: center; gap: 16px;
-  padding: 13px 20px; border-bottom: 1px solid var(--border);
-  cursor: pointer; transition: background .12s;
-  position: relative;
-}
-.project-row:last-child { border-bottom: none; }
-.project-row:hover { background: var(--surface-2); }
-.project-row.is-alert  { border-left: 2px solid var(--rose); }
-.project-row.is-warning{ border-left: 2px solid var(--amber); }
-
-.pr-indicator { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.pr-info { flex: 1; min-width: 0; }
-.pr-name { font-size: 14px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
-.pr-meta { font-size: 12px; color: var(--text-3); display: flex; align-items: center; gap: 8px; }
-.pr-divider { color: var(--border-2); }
-.pr-amounts { display: flex; gap: 6px; flex-shrink: 0; }
-.pr-dates   { display: flex; gap: 16px; flex-shrink: 0; }
-.pr-date    { text-align: right; }
-.pr-date-label { font-size: 10px; color: var(--text-3); margin-bottom: 1px; }
-.pr-date-val   { font-size: 12px; font-weight: 500; font-family: var(--mono); color: var(--text-2); }
-.pr-stage { flex-shrink: 0; }
-
-/* ═══════════════════════════════════════════
    BADGES & PILLS
 ═══════════════════════════════════════════ */
 .badge {
@@ -338,16 +311,6 @@ body::before { display: none; }
 .badge-in-warranty { background: var(--sky-bg);     color: var(--sky);     } .badge-in-warranty::before{ background: var(--sky); }
 .badge-warranty    { background: var(--violet-bg);  color: var(--violet);  } .badge-warranty::before   { background: var(--violet); }
 .badge-done        { background: var(--slate-bg);   color: var(--slate);   } .badge-done::before       { background: var(--slate); }
-
-.amount-pill {
-  display: inline-flex; align-items: center; gap: 4px;
-  font-size: 11px; padding: 2px 8px; border-radius: var(--r-sm);
-  border: 1px solid var(--border); background: var(--surface-2);
-  font-family: var(--mono); color: var(--text-2); white-space: nowrap;
-}
-.amount-pill.active { border-color: rgba(91,106,248,.25); background: var(--brand-bg); color: var(--brand); }
-.amount-pill-label { font-size: 9px; font-weight: 700; color: var(--text-3); letter-spacing: .05em; font-family: var(--font); }
-.amount-pill.active .amount-pill-label { color: rgba(91,106,248,.6); }
 
 /* ═══════════════════════════════════════════
    REMINDER ITEMS
@@ -472,10 +435,42 @@ body::before { display: none; }
 ═══════════════════════════════════════════ */
 .projects-table { display: flex; flex-direction: column; }
 
+/* ── Table column header ── */
+.pr-table-header {
+  display: grid;
+  grid-template-columns: 8px 1fr 180px 220px 210px;
+  gap: 0 14px;
+  padding: 7px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+}
+.pr-th {
+  font-size: 10px; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--text-3);
+}
+.pr-th-r { text-align: right; }
+.pr-th-dates {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  padding-left: 14px; border-left: 1px solid var(--border);
+}
+.pr-th-dates span { text-align: center; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }
+
+/* ── Amount pill empty state ── */
+.amount-pill-empty {
+  opacity: .3;
+}
+.amount-pill-val { font-family: var(--mono); }
+
+/* ═══════════════════════════════════════════
+   PROJECT LIST — ALIGNED TABLE LAYOUT
+═══════════════════════════════════════════ */
+.projects-table { display: flex; flex-direction: column; }
+
 .project-row {
   display: grid;
-  grid-template-columns: 8px 1fr auto auto auto;
-  grid-template-rows: auto auto;
+  /* indicator | name | amounts(fixed) | dates(fixed) | stage(fixed) */
+  grid-template-columns: 8px 1fr 180px 220px 210px;
   align-items: center;
   gap: 0 14px;
   padding: 0 20px;
@@ -505,11 +500,20 @@ body::before { display: none; }
   display: flex; align-items: center; gap: 6px;
 }
 .pr-divider { color: var(--border-2); font-size: 10px; }
+.pr-bid-date {
+  font-family: var(--mono); font-size: 11px; font-weight: 600;
+  color: var(--text-2);
+  background: var(--surface-3);
+  padding: 1px 6px; border-radius: var(--r-xs);
+  letter-spacing: .01em;
+}
 
-/* ── Amount column ── */
+/* ── Amounts column — fixed 180px, right-aligned ── */
 .pr-amounts {
   display: flex; flex-direction: column; gap: 3px;
-  align-items: flex-end; flex-shrink: 0; padding: 12px 0;
+  align-items: flex-end;
+  padding: 12px 0;
+  width: 180px;
 }
 .amount-pill {
   display: inline-flex; align-items: center; gap: 5px;
@@ -517,49 +521,83 @@ body::before { display: none; }
   border: 1px solid var(--border); background: transparent;
   font-family: var(--mono); color: var(--text-3); white-space: nowrap;
   line-height: 1.5;
+  /* fixed width so pills align vertically across rows */
+  min-width: 130px; justify-content: space-between;
 }
 .amount-pill.active {
-  border-color: rgba(91,106,248,.22);
+  border-color: rgba(79,95,247,.22);
   background: var(--brand-bg); color: var(--brand);
   font-weight: 600;
 }
 .amount-pill-label {
   font-size: 9px; font-weight: 700; letter-spacing: .06em;
-  font-family: var(--font);
-  opacity: .5;
-  text-transform: uppercase;
+  font-family: var(--font); opacity: .5; text-transform: uppercase;
 }
 .amount-pill.active .amount-pill-label { opacity: .7; color: var(--brand); }
+.amount-pill-val { font-family: var(--mono); }
 
-/* ── Dates column ── */
+/* ── Dates column — fixed 220px, uses mini-table inside ── */
 .pr-dates {
-  display: flex; gap: 12px; flex-shrink: 0;
-  padding: 12px 0;
+  display: grid;
+  /* 3 equal date slots, always same width */
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  padding: 12px 0 12px 14px;
   border-left: 1px solid var(--border);
-  padding-left: 14px;
+  width: 220px;
 }
-.pr-date { text-align: center; min-width: 52px; }
+.pr-date { text-align: center; }
 .pr-date-label {
   font-size: 9.5px; font-weight: 600; letter-spacing: .06em;
   text-transform: uppercase; color: var(--text-3);
-  margin-bottom: 3px;
+  margin-bottom: 3px; white-space: nowrap;
 }
 .pr-date-val {
   font-size: 12px; font-weight: 500;
   font-family: var(--mono); color: var(--text-2);
-  line-height: 1;
+  line-height: 1; white-space: nowrap;
 }
-.pr-date-val.near { color: var(--amber); }
+.pr-date-val.near   { color: var(--amber); }
 .pr-date-val.urgent { color: var(--rose); font-weight: 700; }
+.pr-date-empty { /* placeholder to keep 3-col grid intact */ }
 
-/* ── Stage + arrow ── */
-.pr-stage { flex-shrink: 0; display: flex; align-items: center; gap: 8px; }
+/* ── Stage column — fixed 210px, right side ── */
+.pr-stage {
+  width: 210px;
+  display: flex; align-items: center; justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 0;
+  border-left: 1px solid var(--border);
+  padding-left: 14px;
+}
 .pr-arrow {
   color: var(--text-3); opacity: 0;
   transform: translateX(-4px);
   transition: all .15s var(--ease);
   flex-shrink: 0;
 }
+
+/* ── Dashboard mini-row (總覽用，與標案管理列表的 5 欄 Grid 分離) ── */
+.mini-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 20px; border-bottom: 1px solid var(--border);
+  cursor: pointer; transition: background .1s;
+}
+.mini-row:last-child { border-bottom: none; }
+.mini-row:hover { background: var(--surface-2); }
+.mini-row .pr-indicator { flex-shrink: 0; }
+.mini-row .pr-info { flex: 1; min-width: 0; overflow: hidden; }
+.mini-row .pr-name {
+  font-size: 13px; font-weight: 600; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+.mini-row .pr-meta {
+  font-size: 11px; color: var(--text-3);
+  display: flex; align-items: center; gap: 5px; flex-wrap: nowrap;
+  white-space: nowrap; overflow: hidden;
+}
+.mini-row .badge { flex-shrink: 0; margin-left: auto; }
 
 /* ═══════════════════════════════════════════
    FORM — REFINED EXPERIENCE
@@ -1297,16 +1335,17 @@ function renderDashboard() {
   const projCount = document.getElementById('dash-proj-count');
   if (projCount) projCount.textContent = recent.length;
   document.getElementById('dash-projects').innerHTML = recent.length
-    ? '<div class="projects-table">'+recent.map(p=>miniRow(p)).join('')+'</div>'
+    ? '<div>'+recent.map(p=>miniRow(p)).join('')+'</div>'
     : `<div class="empty-state"><svg class="empty-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/></svg><div class="empty-title">尚未建立標案</div></div>`;
 }
 
 function miniRow(p) {
-  return `<div class="project-row" onclick="openProject('${p.id}')">
+  const bidDateStr = p.bidDate ? `<span class="pr-bid-date">${fmtDate(p.bidDate)}</span><span class="pr-divider">·</span>` : '';
+  return `<div class="mini-row" onclick="openProject('${p.id}')">
     <div class="pr-indicator" style="background:${stageDot(p.stage)}"></div>
     <div class="pr-info">
       <div class="pr-name">${esc(p.name)}</div>
-      <div class="pr-meta">${esc(p.client||'—')}${p.owner?`<span class="pr-divider">·</span>${esc(p.owner)}`:''}</div>
+      <div class="pr-meta">${bidDateStr}${esc(p.client||'—')}${p.owner?`<span class="pr-divider">·</span>${esc(p.owner)}`:''}</div>
     </div>
     <span class="badge ${stageBadge(p.stage)}">${stageLabel(p.stage)}</span>
   </div>`;
@@ -1317,9 +1356,11 @@ function miniRow(p) {
 ════════════════════════════════════════════════ */
 function sortByBidDate(arr) {
   return [...arr].sort((a,b)=>{
-    const ad=a.bidDate?new Date(a.bidDate).getTime():8640000000000000;
-    const bd=b.bidDate?new Date(b.bidDate).getTime():8640000000000000;
-    return ad!==bd ? ad-bd : String(b.createdAt||'').localeCompare(String(a.createdAt||''));
+    // 無開標日期排最後
+    const ad = a.bidDate ? new Date(a.bidDate).getTime() : -Infinity;
+    const bd = b.bidDate ? new Date(b.bidDate).getTime() : -Infinity;
+    // 降冪：最新開標日期在最前
+    return ad !== bd ? bd - ad : String(b.createdAt||'').localeCompare(String(a.createdAt||''));
   });
 }
 
@@ -1339,30 +1380,37 @@ function renderProjects() {
     el.innerHTML = `<div class="empty-state"><svg class="empty-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg><div class="empty-title">無符合標案</div><div class="empty-sub">試試其他關鍵字或篩選條件</div></div>`;
     return;
   }
-  el.innerHTML = '<div class="projects-table">' + list.map(p => {
+  el.innerHTML = `
+  <div class="pr-table-header">
+    <div></div>
+    <div class="pr-th">標案名稱</div>
+    <div class="pr-th pr-th-r">金額</div>
+    <div class="pr-th pr-th-dates">
+      <span>押標到期</span><span>履保到期</span><span>保固截止</span>
+    </div>
+    <div class="pr-th pr-th-r">階段</div>
+  </div>` +
+  '<div class="projects-table">' + list.map(p => {
     const cls = alertIds.has(p.id)?'is-alert':warnIds.has(p.id)?'is-warning':'';
 
-    // Amount pills — stacked vertically, active = current stage
-    const amounts = [];
-    if (p.bidBond)  amounts.push(`<span class="amount-pill ${p.stage==='bid'?'active':''}"><span class="amount-pill-label">押</span>${fmtMoney(p.bidBond)}</span>`);
-    if (p.perfBond) amounts.push(`<span class="amount-pill ${p.stage==='performance'?'active':''}"><span class="amount-pill-label">履</span>${fmtMoney(p.perfBond)}</span>`);
-    if (p.warBond)  amounts.push(`<span class="amount-pill ${(p.stage==='warranty'||p.stage==='in_warranty')?'active':''}"><span class="amount-pill-label">固</span>${fmtMoney(p.warBond)}</span>`);
-
-    // Date cells with urgency colouring
-    function dateCell(label, dateStr) {
-      if (!dateStr) return '';
-      const d = daysDiff(dateStr);
-      const cls2 = d !== null && d <= 14 ? 'urgent' : d !== null && d <= 30 ? 'near' : '';
-      return `<div class="pr-date">
-        <div class="pr-date-label">${label}</div>
-        <div class="pr-date-val ${cls2}">${fmtDateShort(dateStr)}</div>
-      </div>`;
+    // Amount pills — always render placeholders for missing amounts
+    function amountPill(label, val, active) {
+      if (!val) return `<span class="amount-pill amount-pill-empty"><span class="amount-pill-label">${label}</span><span class="amount-pill-val">—</span></span>`;
+      return `<span class="amount-pill ${active?'active':''}"><span class="amount-pill-label">${label}</span><span class="amount-pill-val">${fmtMoney(val)}</span></span>`;
     }
-    const dates = [
-      dateCell('押標到期', p.bidBondExp),
-      dateCell('履保到期', p.perfExpDate),
-      dateCell('保固截止', p.warExpDate),
-    ].filter(Boolean);
+    const amountHTML =
+      amountPill('押', p.bidBond,  p.stage==='bid') +
+      amountPill('履', p.perfBond, p.stage==='performance') +
+      amountPill('固', p.warBond,  p.stage==='warranty'||p.stage==='in_warranty');
+
+    // Date cells — always 3 slots, empty slot keeps grid structure
+    function dateCell(dateStr) {
+      if (!dateStr) return `<div class="pr-date pr-date-empty"><div class="pr-date-val">—</div></div>`;
+      const d = daysDiff(dateStr);
+      const vc = d !== null && d <= 14 ? 'urgent' : d !== null && d <= 30 ? 'near' : '';
+      return `<div class="pr-date"><div class="pr-date-val ${vc}">${fmtDateShort(dateStr)}</div></div>`;
+    }
+    const datesHTML = dateCell(p.bidBondExp) + dateCell(p.perfExpDate) + dateCell(p.warExpDate);
 
     const arrowSVG = `<div class="pr-arrow"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></div>`;
 
@@ -1370,10 +1418,11 @@ function renderProjects() {
       <div class="pr-indicator" style="background:${stageDot(p.stage)}"></div>
       <div class="pr-info">
         <div class="pr-name">${esc(p.name)}</div>
-        <div class="pr-meta">${esc(p.client||'—')}${p.owner?`<span class="pr-divider">·</span>${esc(p.owner)}`:''}</div>
+        <div class="pr-meta">${p.bidDate?`<span class="pr-bid-date">${fmtDate(p.bidDate)}</span><span class="pr-divider">·</span>`:''
+        }${esc(p.client||'—')}${p.owner?`<span class="pr-divider">·</span>${esc(p.owner)}`:''}</div>
       </div>
-      ${amounts.length ? `<div class="pr-amounts">${amounts.join('')}</div>` : '<div></div>'}
-      ${dates.length ? `<div class="pr-dates">${dates.join('')}</div>` : '<div></div>'}
+      <div class="pr-amounts">${amountHTML}</div>
+      <div class="pr-dates">${datesHTML}</div>
       <div class="pr-stage"><span class="badge ${stageBadge(p.stage)}">${stageLabel(p.stage)}</span>${arrowSVG}</div>
     </div>`;
   }).join('') + '</div>';
