@@ -452,7 +452,7 @@ body::before { display: none; }
 .pr-th-r { text-align: right; }
 .pr-th-dates {
   display: grid; grid-template-columns: repeat(3,1fr);
-  padding-left: 14px; border-left: 1px solid var(--border);
+  padding-left: 14px;
 }
 .pr-th-dates span { text-align: center; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }
 
@@ -512,8 +512,9 @@ body::before { display: none; }
 .pr-amounts {
   display: flex; flex-direction: column; gap: 3px;
   align-items: flex-end;
-  padding: 12px 0;
-  width: 180px;
+  padding: 12px 8px 12px 0;
+  width: 160px;
+  border-right: 1px solid var(--border);
 }
 .amount-pill {
   display: inline-flex; align-items: center; gap: 5px;
@@ -541,9 +542,9 @@ body::before { display: none; }
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 0;
-  padding: 12px 0 12px 14px;
-  border-left: 1px solid var(--border);
+  padding: 12px 8px 12px 14px;
   width: 300px;
+  border-right: 1px solid var(--border);
 }
 .pr-date { text-align: center; }
 .pr-date-label {
@@ -565,9 +566,7 @@ body::before { display: none; }
   width: 200px;
   display: flex; align-items: center; justify-content: flex-end;
   gap: 8px;
-  padding: 12px 0;
-  border-left: 1px solid var(--border);
-  padding-left: 14px;
+  padding: 12px 0 12px 14px;
 }
 .pr-arrow {
   color: var(--text-3); opacity: 0;
