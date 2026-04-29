@@ -739,6 +739,7 @@ body::before { display: none; }
   font-size: 12px; font-weight: 500; color: var(--text-2);
   transition: all .12s;
 }
+.confirm-radio-group .radio-opt.radio-opt-checked,
 .confirm-radio-group .radio-opt:has(input:checked) {
   background: var(--emerald-bg);
   border-color: rgba(5,150,105,.3);
@@ -1552,11 +1553,13 @@ function openProject(id) {
 
   // Fix 1: 確認狀態單選 helper
   function confirmRadio(name, cur, opts) {
-    const items = opts.map(({val,label})=>`
-      <label class="radio-opt">
-        <input type="radio" name="${name}" value="${val}"${cur===val?' checked':''}>
+    const items = opts.map(({val,label})=>{
+      const isChecked = cur === val;
+      return `<label class="radio-opt${isChecked?' radio-opt-checked':''}">
+        <input type="radio" name="${name}" value="${val}"${isChecked?' checked':''} onchange="this.closest('.confirm-radio-group').querySelectorAll('.radio-opt').forEach(l=>l.classList.remove('radio-opt-checked')); this.closest('.radio-opt').classList.add('radio-opt-checked')">
         ${label}
-      </label>`).join('');
+      </label>`;
+    }).join('');
     return `<div class="confirm-radio-group"><label>確認狀態</label>${items}</div>`;
   }
   const bidConfirm   = confirmRadio('bid-confirm',   p.bidConfirm,   [{val:'已收回',label:'✓ 已收回'},{val:'轉履保金',label:'→ 轉履保金'},{val:'轉保固金',label:'→ 轉保固金'}]);
@@ -1719,19 +1722,22 @@ async function saveProject(id) {
     bidApplyDate:'e-bid-apply-date', bidBond:'e-bid-bond', bidPay:'e-bid-pay',
     bidReturnDate:'e-bid-return',
     perfBond:'e-perf-bond', perfPay:'e-perf-pay',
-    perfExpDate:'e-perf-exp', perfEstDate:'e-perf-est', perfDoneDate:'e-perf-done',
+    perfEstDate:'e-perf-est', perfDoneDate:'e-perf-done',
     perfRefundDate:'e-perf-refund-date',
     warPay:'e-war-pay', warExpDate:'e-war-exp',
     warBond:'e-war-bond', warRefund:'e-war-refund', warRefundDate:'e-war-refund-date',
   };
   Object.entries(fieldMap).forEach(([k,elId])=>{ const e=document.getElementById(elId); if(e) p[k]=e.value; });
-  // radio confirmations
-  const bidC = document.querySelector('input[name="bid-confirm"]:checked');
-  const perfC = document.querySelector('input[name="perf-confirm"]:checked');
-  const warC  = document.querySelector('input[name="war-confirm"]:checked');
-  if (bidC)  p.bidConfirm  = bidC.value;
-  if (perfC) p.perfConfirm = perfC.value;
-  if (warC)  p.warConfirm  = warC.value;
+
+  // 可靠的 radio 讀取：querySelectorAll 遍歷，無論是否重新點選都正確讀取
+  function getRadioValue(name) {
+    const radios = document.querySelectorAll(`input[name="${name}"]`);
+    for (const r of radios) { if (r.checked) return r.value; }
+    return '';
+  }
+  p.bidConfirm  = getRadioValue('bid-confirm');
+  p.perfConfirm = getRadioValue('perf-confirm');
+  p.warConfirm  = getRadioValue('war-confirm');
   if (oldStage!==p.stage) {
     if (!p.history) p.history=[];
     p.history.push(nowDateTimeStr()+' 階段變更：'+stageLabel(oldStage)+' → '+stageLabel(p.stage));
