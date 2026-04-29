@@ -731,16 +731,17 @@ body::before { display: none; }
   margin-right: 4px; text-transform: none; letter-spacing: 0;
 }
 .confirm-radio-group .radio-opt {
-  display: flex; align-items: center; gap: 5px;
-  cursor: pointer; padding: 3px 10px;
+  display: inline-flex; align-items: center; gap: 5px;
+  cursor: pointer; padding: 4px 12px;
   border-radius: var(--r-full);
   border: 1px solid var(--border-2);
   background: var(--surface);
   font-size: 12px; font-weight: 500; color: var(--text-2);
   transition: all .12s;
+  font-family: var(--font);
 }
-.confirm-radio-group .radio-opt.radio-opt-checked,
-.confirm-radio-group .radio-opt:has(input:checked) {
+.confirm-radio-group .radio-opt:hover { border-color: var(--border-3); color: var(--text); }
+.confirm-radio-group .radio-opt.radio-opt-checked {
   background: var(--emerald-bg);
   border-color: rgba(5,150,105,.3);
   color: var(--emerald);
@@ -1552,15 +1553,26 @@ function openProject(id) {
     : `<div class="mail-remind-chip no-date">${mailSVG} 填寫「保固截止日期」後自動設定 Mail 提醒</div>`;
 
   // Fix 1: 確認狀態單選 helper
+  // 確認狀態：hidden input 儲存值，button 控制 UI
+  // 完全迴避 radio :checked 在 innerHTML 插入後的 DOM 同步問題
   function confirmRadio(name, cur, opts) {
-    const items = opts.map(({val,label})=>{
-      const isChecked = cur === val;
-      return `<label class="radio-opt${isChecked?' radio-opt-checked':''}">
-        <input type="radio" name="${name}" value="${val}"${isChecked?' checked':''} onchange="this.closest('.confirm-radio-group').querySelectorAll('.radio-opt').forEach(l=>l.classList.remove('radio-opt-checked')); this.closest('.radio-opt').classList.add('radio-opt-checked')">
-        ${label}
-      </label>`;
+    const hid = 'hcr-' + name;
+    const btns = opts.map(({val, label}) => {
+      const active = cur === val;
+      return `<button type="button"
+        class="radio-opt${active ? ' radio-opt-checked' : ''}"
+        data-group="${name}" data-val="${val}"
+        onclick="
+          document.querySelectorAll(&quot;.radio-opt[data-group='${name}']&quot;).forEach(b=>b.classList.remove('radio-opt-checked'));
+          this.classList.add('radio-opt-checked');
+          document.getElementById('${hid}').value=this.dataset.val;
+        ">${label}</button>`;
     }).join('');
-    return `<div class="confirm-radio-group"><label>確認狀態</label>${items}</div>`;
+    return `<div class="confirm-radio-group">
+      <label>確認狀態</label>
+      ${btns}
+      <input type="hidden" id="${hid}" value="${cur||''}">
+    </div>`;
   }
   const bidConfirm   = confirmRadio('bid-confirm',   p.bidConfirm,   [{val:'已收回',label:'✓ 已收回'},{val:'轉履保金',label:'→ 轉履保金'},{val:'轉保固金',label:'→ 轉保固金'}]);
   const perfConfirm  = confirmRadio('perf-confirm',  p.perfConfirm,  [{val:'已收回',label:'✓ 已收回'},{val:'轉保固金',label:'→ 轉保固金'}]);
@@ -1729,11 +1741,10 @@ async function saveProject(id) {
   };
   Object.entries(fieldMap).forEach(([k,elId])=>{ const e=document.getElementById(elId); if(e) p[k]=e.value; });
 
-  // 可靠的 radio 讀取：querySelectorAll 遍歷，無論是否重新點選都正確讀取
+  // hidden input 方案：直接讀取，100% 可靠
   function getRadioValue(name) {
-    const radios = document.querySelectorAll(`input[name="${name}"]`);
-    for (const r of radios) { if (r.checked) return r.value; }
-    return '';
+    const el = document.getElementById('hcr-' + name);
+    return el ? el.value : '';
   }
   p.bidConfirm  = getRadioValue('bid-confirm');
   p.perfConfirm = getRadioValue('perf-confirm');
