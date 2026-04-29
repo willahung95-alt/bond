@@ -717,8 +717,34 @@ body::before { display: none; }
 /* field helper text */
 .field-hint { font-size: 11px; color: var(--text-3); margin-top: 5px; }
 
-.cheque-exp-row { display: none; }
-.cheque-exp-row.visible { display: grid; animation: pgIn .18s var(--ease); margin-top: 12px; }
+/* ── Confirmation radio group ── */
+.confirm-radio-group {
+  display: flex; align-items: center; gap: 6px;
+  flex-wrap: wrap; margin-top: 12px;
+  padding: 10px 14px;
+  background: var(--surface-3);
+  border-radius: var(--r-md);
+  border: 1px solid var(--border-2);
+}
+.confirm-radio-group label {
+  font-size: 12px; font-weight: 500; color: var(--text-2);
+  margin-right: 4px; text-transform: none; letter-spacing: 0;
+}
+.confirm-radio-group .radio-opt {
+  display: flex; align-items: center; gap: 5px;
+  cursor: pointer; padding: 3px 10px;
+  border-radius: var(--r-full);
+  border: 1px solid var(--border-2);
+  background: var(--surface);
+  font-size: 12px; font-weight: 500; color: var(--text-2);
+  transition: all .12s;
+}
+.confirm-radio-group .radio-opt:has(input:checked) {
+  background: var(--emerald-bg);
+  border-color: rgba(5,150,105,.3);
+  color: var(--emerald);
+}
+.confirm-radio-group input[type="radio"] { display: none; }
 
 /* ── Mail reminder chip in form blocks ── */
 .mail-remind-chip {
@@ -1004,7 +1030,7 @@ body::before { display: none; }
     <div class="filter-bar">
       <div class="search-wrap">
         <svg class="search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-        <input class="search-input" type="text" placeholder="搜尋標案、客戶..." id="search-input" oninput="renderProjects()">
+        <input class="search-input" type="text" placeholder="搜尋標案、客戶、負責人..." id="search-input" oninput="renderProjects()">
       </div>
       <div class="seg-control">
         <button class="seg-btn active" onclick="setFilter('all',this)">全部</button>
@@ -1193,12 +1219,12 @@ function nowDateTimeStr() {
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 const STAGE_LABELS = {
-  bid:         '投標：已支付押標金',
-  awarded:     '已得標：待繳履保金',
-  performance: '已履約：已支付履保金',
-  in_warranty: '保固中：已繳保固金',
-  warranty:    '保固到期：退回保固金申請中',
-  done:        '已完成'
+  bid:         '投標－支付押標金',
+  awarded:     '得標－支付履保金',
+  performance: '保固－支付保固金',
+  in_warranty: '保固－支付保固金（進行中）',
+  warranty:    '履約/保固完成－申請退回中',
+  done:        '完成'
 };
 const STAGE_BADGES = {
   bid:'badge-bid', awarded:'badge-awarded', performance:'badge-perf',
@@ -1249,20 +1275,33 @@ function getReminders() {
   projects.forEach(p => {
     if (p.stage==='done') return;
     if (p.stage==='awarded') items.push({label:'押標金待轉換為履保金',project:p.name,id:p.id,days:0,type:'action'});
-    [
-      {label:'押標金到期',     date:p.bidBondExp,    threshold:60, type:'bid'},
-      {label:'押標金預計收回', date:p.bidReturnDate, threshold:30, type:'bid-return'},
-      {label:'履保金到期',     date:p.perfExpDate,   threshold:60, type:'perf'},
-      {label:'預計履約日',     date:p.perfEstDate,   threshold:30, type:'perf-est'},
-      {label:'保固金到期',     date:p.warExpDate,    threshold:60, type:'war'},
-    ].forEach(c => {
-      if (!c.date) return;
-      const d = daysDiff(c.date);
-      if (d!==null && d<=c.threshold) items.push({label:c.label,project:p.name,date:c.date,id:p.id,days:d,type:c.type});
-    });
-    if (p.warExpDate) {
-      const d = daysDiff(p.warExpDate);
-      if (d!==null && d>=0 && d<=31) items.push({label:'請申請保固金退還（截止前一個月）',project:p.name,date:p.warExpDate,id:p.id,days:d,type:'war-refund'});
+    // 押標金：已確認收回或轉換則不顯示到期提醒
+    if (!p.bidConfirm) {
+      [{label:'押標金到期',     date:p.bidBondExp,    threshold:60, type:'bid'},
+       {label:'押標金預計收回', date:p.bidReturnDate, threshold:30, type:'bid-return'}]
+      .forEach(c=>{
+        if(!c.date) return;
+        const d=daysDiff(c.date);
+        if(d!==null&&d<=c.threshold) items.push({label:c.label,project:p.name,date:c.date,id:p.id,days:d,type:c.type});
+      });
+    }
+    // 履保金：已確認收回或轉換則不顯示
+    if (!p.perfConfirm) {
+      [{label:'履保金到期',   date:p.perfExpDate,  threshold:60, type:'perf'},
+       {label:'預計履約日',   date:p.perfEstDate,  threshold:30, type:'perf-est'}]
+      .forEach(c=>{
+        if(!c.date) return;
+        const d=daysDiff(c.date);
+        if(d!==null&&d<=c.threshold) items.push({label:c.label,project:p.name,date:c.date,id:p.id,days:d,type:c.type});
+      });
+    }
+    // 保固金：已確認收回則不顯示
+    if (!p.warConfirm) {
+      if(p.warExpDate){
+        const d=daysDiff(p.warExpDate);
+        if(d!==null&&d<=60) items.push({label:'保固金到期',project:p.name,date:p.warExpDate,id:p.id,days:d,type:'war'});
+        if(d!==null&&d>=0&&d<=31) items.push({label:'請申請保固金退還（截止前一個月）',project:p.name,date:p.warExpDate,id:p.id,days:d,type:'war-refund'});
+      }
     }
   });
   return items.sort((a,b)=>a.days-b.days);
@@ -1308,9 +1347,9 @@ function renderDashboard() {
   const active = projects.filter(p=>p.stage!=='done').length;
   const rem    = getReminders();
   const urgent = rem.filter(r=>r.days<=14&&r.type!=='action'&&r.type!=='war-refund').length;
-  const warRef = rem.filter(r=>r.type==='war-refund').length;
+  const warRef = projects.filter(p => p.stage !== 'done' && (p.perfRefundDate || p.warRefundDate)).length;
 
-  // Update reminder badge in sidebar
+  // Update reminder badge in sidebar — urgent 到期 + 退還申請中
   const badge = document.getElementById('reminder-badge');
   const totalAlerts = urgent + warRef;
   badge.style.display = totalAlerts > 0 ? '' : 'none';
@@ -1339,7 +1378,7 @@ function renderDashboard() {
       <div class="stat-card-glow"></div>
       <div class="stat-chip"><div class="stat-chip-dot"></div>申請中</div>
       <div class="stat-value">${warRef}</div>
-      <div class="stat-label">保固退還申請</div>
+      <div class="stat-label">保證金退還申請</div>
     </div>`;
 
   const top = rem.slice(0,6);
@@ -1387,7 +1426,7 @@ function renderProjects() {
   const list = sortByBidDate(projects).filter(p => {
     const ms = filterStatus==='__active__' ? p.stage!=='done'
              : filterStatus==='all' ? true : p.stage===filterStatus;
-    const mq = !q || p.name.toLowerCase().includes(q) || (p.client||'').toLowerCase().includes(q);
+    const mq = !q || p.name.toLowerCase().includes(q) || (p.client||'').toLowerCase().includes(q) || (p.owner||'').toLowerCase().includes(q);
     return ms && mq;
   });
   const rem = getReminders();
@@ -1487,8 +1526,14 @@ function openProject(id) {
       </div>${content}</div>`;
   }
 
-  const stageOpts = ['bid','awarded','performance','in_warranty','warranty','done'].map(s=>opt(s,p.stage,stageLabel(s))).join('');
-  const warModeOpts = opt('new',p.warrantyMode,'另繳保固金') + opt('convert',p.warrantyMode,'履保金轉保固金（差額退還）');
+  const stageOpts = ['bid','awarded','performance','warranty','done']
+    .map(s=>opt(s,p.stage,stageLabel(s))).join('');
+
+  // Fix 5: 保固金繳納方式新選項（無保固金模式）
+  function warPayOpt(cur) {
+    const opts = ['履保金轉保固金','押標金轉保固金','匯款','支票'];
+    return `<option value="">請選擇</option>` + opts.map(v=>`<option${cur===v?' selected':''}>${v}</option>`).join('');
+  }
 
   // Mail 提醒 icon
   const mailSVG = `<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>`;
@@ -1504,6 +1549,19 @@ function openProject(id) {
   const warRemindChip = p.warExpDate
     ? `<div class="mail-remind-chip c-violet">${mailSVG} Mail 提醒：<strong>${fmtDate(p.warExpDate)}</strong> 前 <strong>10 天</strong>自動通知申請退還保固金</div>`
     : `<div class="mail-remind-chip no-date">${mailSVG} 填寫「保固截止日期」後自動設定 Mail 提醒</div>`;
+
+  // Fix 1: 確認狀態單選 helper
+  function confirmRadio(name, cur, opts) {
+    const items = opts.map(({val,label})=>`
+      <label class="radio-opt">
+        <input type="radio" name="${name}" value="${val}"${cur===val?' checked':''}>
+        ${label}
+      </label>`).join('');
+    return `<div class="confirm-radio-group"><label>確認狀態</label>${items}</div>`;
+  }
+  const bidConfirm   = confirmRadio('bid-confirm',   p.bidConfirm,   [{val:'已收回',label:'✓ 已收回'},{val:'轉履保金',label:'→ 轉履保金'},{val:'轉保固金',label:'→ 轉保固金'}]);
+  const perfConfirm  = confirmRadio('perf-confirm',  p.perfConfirm,  [{val:'已收回',label:'✓ 已收回'},{val:'轉保固金',label:'→ 轉保固金'}]);
+  const warConfirm   = confirmRadio('war-confirm',   p.warConfirm,   [{val:'已收回',label:'✓ 已收回'}]);
 
   const warDay = p.warExpDate ? daysDiff(p.warExpDate) : null;
   const warNote = warDay!==null&&warDay>=0&&warDay<=31
@@ -1560,34 +1618,36 @@ function openProject(id) {
       <div class="grid-4" style="margin-bottom:0">
         <div class="field"><label>申請日期</label><input type="date" id="e-bid-apply-date" value="${p.bidApplyDate||''}"></div>
         <div class="field"><label>押標金金額（元）</label>${numField('e-bid-bond',p.bidBond)}</div>
-        <div class="field"><label>繳納方式</label><div class="sel-wrap"><select id="e-bid-pay" onchange="toggleChequeExp('e-bid-pay','bid-chk-row')">${payOpt(p.bidPay)}</select></div></div>
+        <div class="field"><label>繳納方式</label><div class="sel-wrap"><select id="e-bid-pay">${payOpt(p.bidPay)}</select></div></div>
         <div class="field"><label>預計收回日</label><input type="date" id="e-bid-return" value="${p.bidReturnDate||''}"></div>
       </div>
-      ${chkRow('bid-chk-row','e-bid-exp',p.bidBondExp,p.bidPay==='支票')}
+      ${bidConfirm}
       ${bidRemindChip}`)}
 
     ${block('var(--emerald)', moneyIcon('var(--emerald)'), '履保金', `
-      <div class="grid-3" style="margin-bottom:0">
+      <div class="grid-4" style="margin-bottom:0">
         <div class="field"><label>履保金金額（元）</label>${numField('e-perf-bond',p.perfBond)}</div>
-        <div class="field"><label>繳納方式</label><div class="sel-wrap"><select id="e-perf-pay" onchange="toggleChequeExp('e-perf-pay','perf-chk-row')">${payOpt(p.perfPay,true)}</select></div></div>
+        <div class="field"><label>繳納方式</label><div class="sel-wrap"><select id="e-perf-pay" onchange="onPerfPayChange()">${payOpt(p.perfPay,true)}</select></div></div>
         <div class="field"><label>預計履約日</label><input type="date" id="e-perf-est" value="${p.perfEstDate||''}"></div>
         <div class="field"><label>實際履約完成日</label><input type="date" id="e-perf-done" value="${p.perfDoneDate||''}"></div>
       </div>
-      ${chkRow('perf-chk-row','e-perf-exp',p.perfExpDate,p.perfPay==='支票')}
+      <div class="grid-2" style="margin-top:10px">
+        <div class="field"><label>退還申請日</label><input type="date" id="e-perf-refund-date" value="${p.perfRefundDate||''}"></div>
+      </div>
+      ${perfConfirm}
       ${perfRemindChip}`)}
 
     ${block('var(--violet)', moneyIcon('var(--violet)'), '保固金', `
       <div class="grid-3" style="margin-bottom:0">
-        <div class="field"><label>保固金模式</label><div class="sel-wrap"><select id="e-war-mode">${warModeOpts}</select></div></div>
-        <div class="field"><label>繳納方式</label><div class="sel-wrap"><select id="e-war-pay" onchange="toggleChequeExp('e-war-pay','war-chk-row')">${payOpt(p.warPay)}</select></div></div>
+        <div class="field"><label>繳納方式</label><div class="sel-wrap"><select id="e-war-pay" onchange="onWarPayChange()">${warPayOpt(p.warPay)}</select></div></div>
         <div class="field"><label>保固截止日期</label><input type="date" id="e-war-exp" value="${p.warExpDate||''}"></div>
-      </div>
-      ${chkRow('war-chk-row','e-war-chk-exp',p.warChkExp,p.warPay==='支票')}
-      <div class="grid-3" style="margin-top:10px">
         <div class="field"><label>保固金金額（元）</label>${numField('e-war-bond',p.warBond)}</div>
-        <div class="field"><label>退還差額（元）</label>${numField('e-war-refund',p.warRefund,'履保轉保固填寫')}</div>
+      </div>
+      <div class="grid-3" style="margin-top:10px">
+        <div class="field"><label>退還差額（元）</label>${numField('e-war-refund',p.warRefund,'轉換時填寫')}</div>
         <div class="field"><label>退還申請日</label><input type="date" id="e-war-refund-date" value="${p.warRefundDate||''}"></div>
       </div>
+      ${warConfirm}
       ${warRemindChip}`)}
 
     ${histHTML}
@@ -1616,16 +1676,33 @@ function openProject(id) {
 /* ════════════════════════════════════════════════
    CHEQUE TOGGLE
 ════════════════════════════════════════════════ */
-function toggleChequeExpAdd() {
-  const sel=document.getElementById('f-bid-pay');
-  const row=document.getElementById('f-bid-chk-row');
-  if(sel&&row) row.classList.toggle('visible',sel.value==='支票');
+/* ── Auto-fill: 履保金 繳納方式 → 押標金轉履保金 ── */
+function onPerfPayChange() {
+  const sel = document.getElementById('e-perf-pay');
+  if (!sel) return;
+  if (sel.value === '押標金轉履保金') {
+    const bidBond = document.getElementById('e-bid-bond');
+    const perfBond = document.getElementById('e-perf-bond');
+    if (bidBond && perfBond && !perfBond.value) perfBond.value = bidBond.value;
+  }
 }
-function toggleChequeExp(selectId,rowId) {
-  const sel=document.getElementById(selectId);
-  const row=document.getElementById(rowId);
-  if(sel&&row) row.classList.toggle('visible',sel.value==='支票');
+
+/* ── Auto-fill: 保固金 繳納方式 → 轉保固金 ── */
+function onWarPayChange() {
+  const sel = document.getElementById('e-war-pay');
+  const warBond = document.getElementById('e-war-bond');
+  if (!sel || !warBond || warBond.value) return;
+  if (sel.value === '履保金轉保固金') {
+    const src = document.getElementById('e-perf-bond');
+    if (src) warBond.value = src.value;
+  } else if (sel.value === '押標金轉保固金') {
+    const src = document.getElementById('e-bid-bond');
+    if (src) warBond.value = src.value;
+  }
 }
+
+function toggleChequeExpAdd() { /* 支票有效期限已移除，保留空函式避免呼叫錯誤 */ }
+function toggleChequeExp() { /* 同上 */ }
 
 /* ════════════════════════════════════════════════
    SAVE PROJECT
@@ -1640,14 +1717,21 @@ async function saveProject(id) {
     name:'e-name', client:'e-client', owner:'e-owner',
     bidDate:'e-bid-date', amount:'e-amount', note:'e-note', stage:'e-stage',
     bidApplyDate:'e-bid-apply-date', bidBond:'e-bid-bond', bidPay:'e-bid-pay',
-    bidBondExp:'e-bid-exp', bidReturnDate:'e-bid-return',
+    bidReturnDate:'e-bid-return',
     perfBond:'e-perf-bond', perfPay:'e-perf-pay',
     perfExpDate:'e-perf-exp', perfEstDate:'e-perf-est', perfDoneDate:'e-perf-done',
-    warrantyMode:'e-war-mode', warPay:'e-war-pay', warExpDate:'e-war-exp',
-    warChkExp:'e-war-chk-exp',
+    perfRefundDate:'e-perf-refund-date',
+    warPay:'e-war-pay', warExpDate:'e-war-exp',
     warBond:'e-war-bond', warRefund:'e-war-refund', warRefundDate:'e-war-refund-date',
   };
   Object.entries(fieldMap).forEach(([k,elId])=>{ const e=document.getElementById(elId); if(e) p[k]=e.value; });
+  // radio confirmations
+  const bidC = document.querySelector('input[name="bid-confirm"]:checked');
+  const perfC = document.querySelector('input[name="perf-confirm"]:checked');
+  const warC  = document.querySelector('input[name="war-confirm"]:checked');
+  if (bidC)  p.bidConfirm  = bidC.value;
+  if (perfC) p.perfConfirm = perfC.value;
+  if (warC)  p.warConfirm  = warC.value;
   if (oldStage!==p.stage) {
     if (!p.history) p.history=[];
     p.history.push(nowDateTimeStr()+' 階段變更：'+stageLabel(oldStage)+' → '+stageLabel(p.stage));
