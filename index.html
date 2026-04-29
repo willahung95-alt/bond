@@ -1755,7 +1755,15 @@ async function saveProject(id) {
   }
   const result = await apiPost('update',{project:p});
   btn.disabled=false; btn.innerHTML='<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>儲存變更';
-  if (result!==null) { toast('變更已儲存','success'); closeModal(); renderDashboard(); renderProjects(); }
+  if (result!==null) {
+    // 立刻把更新後的值寫回本地 projects，確保 getReminders() 立即反映確認狀態
+    const idx = projects.findIndex(x=>x.id===p.id);
+    if (idx >= 0) projects[idx] = {...projects[idx], ...p};
+    toast('變更已儲存','success');
+    closeModal();
+    renderDashboard();
+    renderProjects();
+  }
 }
 
 /* ════════════════════════════════════════════════
